@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://raw.githubusercontent.com/ALLOVRStudios/ovr-program/main/allovr_icon.png" margin="auto" height="175"/>
+    <img src="https://raw.githubusercontent.com/ALLOVRStudios/ovr-program/main/allovr_banner.jpg" margin="auto" height="175"/>
 </p>
 
 # OVR Program
