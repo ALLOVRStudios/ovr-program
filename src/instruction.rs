@@ -13,19 +13,36 @@ pub struct InitialisaAllovrArgs {
 #[repr(C)]
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, BorshSchema)]
 pub enum AllovrInstruction {
-    IntialiseAllovr(InitialisaAllovrArgs),
-    /// Mint ALLOVR Token
-    ///
-    ///
+    /// Initialise ALLOVR Token
     ///
     /// Accounts expected:
     ///
-    /// 0. `[signer, writable]` Initator (program_id)
-    /// 1. `[writable, signer]` Payer
-    /// 2. `[writable]` The Program State account with PDA
-    /// ... TODO    
-    ///     
+    /// `[writable, signer]` Initator (program_id)
+    /// `[writable, signer]` State (PDA with seed prefix ALLOVRSTATE)
+    /// `[writable, signer]` Payer
+    /// `[writable, signer]` Mint (ALLOVR Mint account with known address ALLM...)
+    /// `[]` Mint Authority (PDA with seed prefix ALLOVRMINT)
+    /// `[]` Token Program
+    /// `[]` Rent Sysvar
+    /// `[]` System    
+    IntialiseAllovr(InitialisaAllovrArgs),
+    /// Mint ALLOVR Token
+    ///
+    /// Accounts expected:
+    ///
+    /// `[signer]` Initator (program_id)
+    /// `[writable]` State (PDA with seed prefix ALLOVRSTATE)
+    /// `[writable, signer]` Payer
+    /// `[writable]` Mint (ALLOVR Mint account with known address ALLM...)
+    /// `[]` Mint Authority (PDA with seed prefix ALLOVRMINT)
+    /// `[writable]` Treasury Token Account
+    /// `[writable]` Founder 1 Token Account
+    /// `[writable]` Founder 2 Token Account
+    /// `[writable]` Founder 3 Token Account
+    /// `[writable]` Founder 4 Token Account
+    /// `[]` Token Program
+    /// `[]` Rent Sysvar
+    /// `[]` Clock Sysvar
+    /// `[]` System    
     MintAllovr,
-    /// TODO
-    TriggerInflation,
 }

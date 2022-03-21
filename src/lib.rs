@@ -7,7 +7,8 @@ pub mod state;
 pub mod utils;
 
 // PDA Seed Prefixes
-pub const ALLOVR_MINT_SEED: &'static str = "ALLOVRMINT";
+pub const ALLOVR_STATE_SEED_PREFIX: &'static str = "ALLOVRSTATE";
+pub const ALLOVR_MINT_SEED_PREFIX: &'static str = "ALLOVRMINT";
 pub const ARTIST_SEED_PREFIX: &'static str = "ALLOVRARTIST";
 pub const ARTIST_METADATA_SEED_PREFIX: &'static str = "ALLOVRARTISTMETA";
 pub const ARTWORK_SEED_PREFIX: &'static str = "ALLOVRARTWORK";
@@ -16,10 +17,11 @@ pub const ARTWORK_ESCROW_SEED_PREFIX: &'static str = "ALLOVRARTWORKESCROW";
 
 // Known Addresses
 pub const ALLOVR_PROGRAM_ID: &'static str = "B6w8UQGNEbujVCvtdMhsEPfjnxd3w8MgiMTx6syAu123";
+pub const ALLOVR_STATE_ID: &'static str = "ALLSsF2ZPrXLSBerAGZoig9nRLPb9sVsWcnM7j3u6JfR";
 pub const ALLOVR_MINT_ID: &'static str = "ALLMusFNnKAjg5QdbmcSxPsseERfUb4WFvvxU6zaR337";
 pub const ALLOVR_TREASURY_ID: &'static str = "ALLTebv8dpcbxiBdxKmSJ88GDKxhTXVvD9ihsvvnsB55";
 
-pub const AOV_DECIMAL_PLACES: u8 = 9;
+pub const ALL_DECIMAL_PLACES: u8 = 9;
 pub const MINT_SIZE: usize = 82;
 pub const STATE_SIZE: usize = 1 + // minted
     64 + // Next Inflation Due UnixTimestamp

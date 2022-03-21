@@ -25,10 +25,6 @@ impl Processor {
                 msg!("Mint ALLOVR Instruction");
                 mint_allovr::execute(accounts, program_id)
             }
-            AllovrInstruction::TriggerInflation => {
-                msg!("Trigger Inflation Instruction");
-                trigger_inflation::execute(accounts, program_id)
-            }
         }
     }
 }

@@ -1,5 +1,5 @@
 use crate::error::AllovrError;
-use crate::AOV_DECIMAL_PLACES;
+use crate::ALL_DECIMAL_PLACES;
 use solana_program::account_info::AccountInfo;
 use solana_program::entrypoint::ProgramResult;
 use solana_program::msg;
@@ -13,7 +13,7 @@ use std::convert::TryInto;
 use std::str::FromStr;
 
 pub fn ui_amount_to_amount(aov: f64) -> u64 {
-    spl_token::ui_amount_to_amount(aov, AOV_DECIMAL_PLACES)
+    spl_token::ui_amount_to_amount(aov, ALL_DECIMAL_PLACES)
 }
 
 pub fn assert_rent_exempt(rent: &Rent, account_info: &AccountInfo) -> ProgramResult {
@@ -114,6 +114,14 @@ pub fn assert_signer(account_info: &AccountInfo) -> ProgramResult {
 pub fn assert_program_id(program_id: &Pubkey) -> ProgramResult {
     if *program_id != Pubkey::from_str(crate::ALLOVR_PROGRAM_ID).unwrap() {
         Err(AllovrError::InvalidProgramId.into())
+    } else {
+        Ok(())
+    }
+}
+
+pub fn assert_state(state: &Pubkey) -> ProgramResult {
+    if *state != Pubkey::from_str(crate::ALLOVR_STATE_ID).unwrap() {
+        Err(AllovrError::InvalidStateAccount.into())
     } else {
         Ok(())
     }
