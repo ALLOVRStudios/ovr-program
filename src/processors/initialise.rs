@@ -1,8 +1,8 @@
 use crate::instruction::InitialisaAllovrArgs;
 use crate::state::AllovrTokenState;
 use crate::{
-    error::AllovrError, utils::*, ALLOVR_MINT_SEED_PREFIX, ALLOVR_STATE_SEED_PREFIX,
-    ALL_DECIMAL_PLACES, MINT_SIZE, STATE_SIZE,
+    error::AllovrError, utils::*, ALLOVR_MINT_SEED_PREFIX, ALL_DECIMAL_PLACES, MINT_SIZE,
+    STATE_SIZE,
 };
 use borsh::BorshSerialize;
 
@@ -33,7 +33,6 @@ pub fn execute(
     let rent = Rent::get()?;
 
     let a = parse_accounts(program_id, accounts)?;
-    
     // Create State account with known address. Can only be crated once, hence init can only be called once
     create_account(
         &rent,
@@ -51,17 +50,15 @@ pub fn execute(
         founder_2: args.founder_2,
         founder_3: args.founder_3,
         founder_4: args.founder_4,
+        founder_5: args.founder_5,
+        founder_6: args.founder_6,
+        founder_7: args.founder_7,
+        founder_8: args.founder_8,
     };
     state_data.serialize(&mut &mut a.state.data.borrow_mut()[..])?;
 
     // Create Mint Account. Mint address is known ALLOVR_MINT_ID
-    create_account(
-        &rent,
-        MINT_SIZE,
-        &a.payer,
-        &a.mint,
-        spl_token::id(),
-    )?;
+    create_account(&rent, MINT_SIZE, &a.payer, &a.mint, spl_token::id())?;
 
     // Check mint authority account matches expected mint authority PDA
     let (_mint_auth_pda, mint_auth_pda_bump) = assert_pda(
@@ -100,7 +97,7 @@ fn parse_accounts<'a, 'b: 'a>(
 
     assert_program_id(program_id)?;
     assert_system(&a.system)?;
-    assert_state(&a.state.key)?;    
+    assert_state(&a.state.key)?;
     assert_token_program_matches_package(&a.token_program)?;
 
     assert_owned_by(a.payer, &solana_program::system_program::id())?; // standard SOL account
@@ -112,5 +109,5 @@ fn parse_accounts<'a, 'b: 'a>(
         return Err(AllovrError::InvalidInitialiser.into());
     }
 
-    Ok(a)    
+    Ok(a)
 }

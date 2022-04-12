@@ -8,6 +8,10 @@ pub struct InitialisaAllovrArgs {
     pub founder_2: Pubkey,
     pub founder_3: Pubkey,
     pub founder_4: Pubkey,
+    pub founder_5: Pubkey,
+    pub founder_6: Pubkey,
+    pub founder_7: Pubkey,
+    pub founder_8: Pubkey,
 }
 
 #[repr(C)]
@@ -40,6 +44,10 @@ pub enum AllovrInstruction {
     /// `[writable]` Founder 2 Token Account
     /// `[writable]` Founder 3 Token Account
     /// `[writable]` Founder 4 Token Account
+    /// `[writable]` Founder 5 Token Account
+    /// `[writable]` Founder 6 Token Account
+    /// `[writable]` Founder 7 Token Account
+    /// `[writable]` Founder 8 Token Account
     /// `[]` Token Program
     /// `[]` Rent Sysvar
     /// `[]` Clock Sysvar

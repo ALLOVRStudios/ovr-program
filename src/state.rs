@@ -11,4 +11,8 @@ pub struct AllovrTokenState {
     pub founder_2: Pubkey,
     pub founder_3: Pubkey,
     pub founder_4: Pubkey,
+    pub founder_5: Pubkey,
+    pub founder_6: Pubkey,
+    pub founder_7: Pubkey,
+    pub founder_8: Pubkey,
 }

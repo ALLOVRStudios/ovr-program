@@ -1,12 +1,11 @@
-
 [package]
-name = "solana-bpf-helloworld"
+name = "ovr-program"
 version = "0.0.1"
-description = "Example template program written in Rust"
-authors = ["Solana Maintainers <maintainers@solana.com>"]
-repository = "https://github.com/solana-labs/solana"
+description = "The ALLOVR smart contract"
+authors = ["Bosko Kovacevic (bosko@allovr.io)"]
+repository = "https://github.com/ALLOVRStudios/ovr-program"
 license = "Apache-2.0"
-homepage = "https://solana.com/"
+homepage = "https://www.allovr.io"
 edition = "2018"
 
 [features]
@@ -14,7 +13,6 @@ no-entrypoint = []
 
 [dependencies]
 borsh = "0.9.1"
-# borsh-derive = "0.9.1"
 solana-program = "~1.9.5"
 arrayref = "0.3.6"
 num-derive = "0.3"

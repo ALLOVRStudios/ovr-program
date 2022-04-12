@@ -61,15 +61,13 @@ The following accounts are required:
 
 ## Known addresses
 
-pub const ALLOVR_PROGRAM_ID: &'static str = "B6w8UQGNEbujVCvtdMhsEPfjnxd3w8MgiMTx6syAu123";
-pub const ALLOVR_STATE_ID: &'static str = "ALLSsF2ZPrXLSBerAGZoig9nRLPb9sVsWcnM7j3u6JfR";
-pub const ALLOVR_MINT_ID: &'static str = "ALLMusFNnKAjg5QdbmcSxPsseERfUb4WFvvxU6zaR337";
-
 |Account|Address                                     |
-|-------|--------------------------------------------|
-|Program|B6w8UQGNEbujVCvtdMhsEPfjnxd3w8MgiMTx6syAu123|
-|State  |ALLSsF2ZPrXLSBerAGZoig9nRLPb9sVsWcnM7j3u6JfR|
-|Mint   |ALLMusFNnKAjg5QdbmcSxPsseERfUb4WFvvxU6zaR337|
+|-----------|--------------------------------------------|
+|Program    |ovRW7Yrq6Nqcz3GXnL4wexGZJeoJjRwo5EHdpWwLEDe|
+|State      |ALLSghdXR2TRNyrKhyGSNvqb55A6LqTUszcPLnoQ99Fw|
+|Mint       |Aovr4TdVH6qtZHcv4og6CLqn7gjNYtmDRQULYZSTz1Qf|
+|Givernance |ALLGnZikNaJQeN4KCAbDjZRSzvSefUdeTpk18yfizZvT|
+
 
 ## Build
 
@@ -82,5 +80,10 @@ pub const ALLOVR_MINT_ID: &'static str = "ALLMusFNnKAjg5QdbmcSxPsseERfUb4WFvvxU6
 ## Test
 
     cargo test-bpf
+
+## Local development note
+solana-test-validator -r (-r to clear data and start again)
+cargo build-bpf --manifest-path=./Cargo.toml --bpf-out-dir=/mnt/c/allovr_data/program
+solana program deploy /mnt/c/allovr_data/program/allovr_token.so
 
 More coming soon.

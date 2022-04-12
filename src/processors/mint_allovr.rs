@@ -19,11 +19,15 @@ struct Accounts<'a, 'b: 'a> {
     payer: &'a AccountInfo<'b>,
     mint: &'a AccountInfo<'b>,
     mint_authority: &'a AccountInfo<'b>,
-    treasury_token: &'a AccountInfo<'b>,    
+    treasury_token: &'a AccountInfo<'b>,
     founder_1_token: &'a AccountInfo<'b>,
     founder_2_token: &'a AccountInfo<'b>,
     founder_3_token: &'a AccountInfo<'b>,
     founder_4_token: &'a AccountInfo<'b>,
+    founder_5_token: &'a AccountInfo<'b>,
+    founder_6_token: &'a AccountInfo<'b>,
+    founder_7_token: &'a AccountInfo<'b>,
+    founder_8_token: &'a AccountInfo<'b>,
     token_program: &'a AccountInfo<'b>,
     _rent_sysvar: &'a AccountInfo<'b>,
     clock_sysvar: &'a AccountInfo<'b>,
@@ -37,7 +41,7 @@ pub fn execute(accounts: &[AccountInfo], program_id: &Pubkey) -> ProgramResult {
 
     // Initial token mint and split
     // Supply: 100 000 000
-    // Founders: 30%    
+    // Founders: 30%
     // Treasury: 70%
 
     let clock = Clock::from_account_info(a.clock_sysvar)?;
@@ -60,23 +64,36 @@ pub fn execute(accounts: &[AccountInfo], program_id: &Pubkey) -> ProgramResult {
     if a.founder_4_token.key.ne(&state.founder_4) {
         return Err(AllovrError::IncorrectFounderAddress.into());
     }
+    if a.founder_5_token.key.ne(&state.founder_5) {
+        return Err(AllovrError::IncorrectFounderAddress.into());
+    }
+    if a.founder_6_token.key.ne(&state.founder_6) {
+        return Err(AllovrError::IncorrectFounderAddress.into());
+    }
+    if a.founder_7_token.key.ne(&state.founder_7) {
+        return Err(AllovrError::IncorrectFounderAddress.into());
+    }
+    if a.founder_8_token.key.ne(&state.founder_8) {
+        return Err(AllovrError::IncorrectFounderAddress.into());
+    }
 
     state.minted = true;
     state.next_inflation_due = clock.unix_timestamp + INFLATION_INTERVAL_IN_SECONDS;
     state.serialize(&mut &mut a.state.data.borrow_mut()[..])?;
 
-    let total = 100000000.0;
-    let founder_share = ui_amount_to_amount(total * 0.075);
+    let total = 1000000000.0;
+    let founder_share = ui_amount_to_amount(total * 0.0375);
     let treasury_share = ui_amount_to_amount(total * 0.7);
     let recipients: Vec<(&AccountInfo, u64)> = vec![
-        (
-            a.treasury_token,
-            treasury_share,
-        ),
+        (a.treasury_token, treasury_share),
         (a.founder_1_token, founder_share),
         (a.founder_2_token, founder_share),
         (a.founder_3_token, founder_share),
         (a.founder_4_token, founder_share),
+        (a.founder_5_token, founder_share),
+        (a.founder_6_token, founder_share),
+        (a.founder_7_token, founder_share),
+        (a.founder_8_token, founder_share),
     ];
 
     let (_mint_auth_pda, mint_auth_pda_bump) = assert_pda(
@@ -119,6 +136,10 @@ fn parse_accounts<'a, 'b: 'a>(
         founder_2_token: next_account_info(account_iter)?,
         founder_3_token: next_account_info(account_iter)?,
         founder_4_token: next_account_info(account_iter)?,
+        founder_5_token: next_account_info(account_iter)?,
+        founder_6_token: next_account_info(account_iter)?,
+        founder_7_token: next_account_info(account_iter)?,
+        founder_8_token: next_account_info(account_iter)?,
         token_program: next_account_info(account_iter)?,
         _rent_sysvar: next_account_info(account_iter)?,
         clock_sysvar: next_account_info(account_iter)?,
@@ -136,15 +157,23 @@ fn parse_accounts<'a, 'b: 'a>(
     assert_owned_by(a.founder_2_token, &spl_token::id())?;
     assert_owned_by(a.founder_3_token, &spl_token::id())?;
     assert_owned_by(a.founder_4_token, &spl_token::id())?;
+    assert_owned_by(a.founder_5_token, &spl_token::id())?;
+    assert_owned_by(a.founder_6_token, &spl_token::id())?;
+    assert_owned_by(a.founder_7_token, &spl_token::id())?;
+    assert_owned_by(a.founder_8_token, &spl_token::id())?;
 
     assert_rent_exempt(rent, a.treasury_token)?;
     assert_rent_exempt(rent, a.founder_1_token)?;
     assert_rent_exempt(rent, a.founder_2_token)?;
     assert_rent_exempt(rent, a.founder_3_token)?;
     assert_rent_exempt(rent, a.founder_4_token)?;
+    assert_rent_exempt(rent, a.founder_5_token)?;
+    assert_rent_exempt(rent, a.founder_6_token)?;
+    assert_rent_exempt(rent, a.founder_7_token)?;
+    assert_rent_exempt(rent, a.founder_8_token)?;
 
     assert_signer(a.payer)?;
-    assert_signer(a.initiator)?;    
+    assert_signer(a.initiator)?;
 
     if a.initiator.key != program_id {
         return Err(AllovrError::InvalidInitialiser.into());
