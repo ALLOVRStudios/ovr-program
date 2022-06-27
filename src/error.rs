@@ -32,12 +32,41 @@ pub enum AllovrError {
     InvalidSystemProgramId,
     #[error("Invalid Clock Sysvar ID")]
     InvalidClockSysvarId,
+    #[error("Invalid Artist Token Account")]
+    InvalidArtistTokenAccount,
+    #[error("Invalid Artwork Token Account")]
+    InvalidArtworkTokenAccount,
     #[error("Invalid ALLOVR Mint")]
     InvalidAllovrMint,
     #[error("Invalid ALLOVR Treasury")]
     InvalidAllovrTreasury,
     #[error("Invalid Associated Token Account")]
     InvalidAssociatedTokenAccount,
+    #[error("Invalid Artwork Symbol")]
+    InvalidArtworkSymbol,
+    #[error("Artwork Description Max Length Exceeded")]
+    ArtworkDescriptionMaxLengthExceeded,
+
+    // Artist
+    #[error("Invalid Artist Name")]
+    InvalidArtistName,
+    #[error("Invalid Artist Description")]
+    InvalidArtistDescription,
+    #[error("Invalid Artist Symbol")]
+    InvalidArtistSymbol,
+    #[error("Invalid Artist Image Url")]
+    InvalidArtistImageUrl,
+
+    #[error("Artwork Under Offer")]
+    ArtworkUnderOffer,
+    #[error("Incorrect Artwork Buyer")]
+    IncorrectArtworkBuyer,
+    #[error("Incorrect Payment Account")]
+    IncorrectPaymentAccount,
+    #[error("Incorrect Artwork Holder")]
+    IncorrectArtworkHolder,
+    #[error("Invalid Offer")]
+    InvalidOffer,
     #[error("Inflation Not Due")]
     InflationNotDue,
     #[error("Incorrect founder address")]

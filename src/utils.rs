@@ -1,3 +1,7 @@
+use crate::ARTIST_METADATA_IMAGE_URL_SIZE;
+use crate::ARTIST_METADATA_DESCRIPTION_SIZE;
+use crate::ARTIST_METADATA_NAME_SIZE;
+use crate::instruction::RegisterArtistArgs;
 use crate::error::AllovrError;
 use crate::ALL_DECIMAL_PLACES;
 use solana_program::account_info::AccountInfo;
@@ -5,6 +9,7 @@ use solana_program::entrypoint::ProgramResult;
 use solana_program::msg;
 use solana_program::program::invoke;
 use solana_program::program::invoke_signed;
+use solana_program::program_error::ProgramError;
 use solana_program::program_pack::Pack;
 use solana_program::pubkey::Pubkey;
 use solana_program::system_instruction;
@@ -122,6 +127,14 @@ pub fn assert_program_id(program_id: &Pubkey) -> ProgramResult {
 pub fn assert_state(state: &Pubkey) -> ProgramResult {
     if *state != Pubkey::from_str(crate::ALLOVR_STATE_ID).unwrap() {
         Err(AllovrError::InvalidStateAccount.into())
+    } else {
+        Ok(())
+    }
+}
+
+pub fn assert_aovr_treasury(treasury: &Pubkey) -> ProgramResult {
+    if *treasury != Pubkey::from_str(crate::ALLOVR_AOVR_TREASURY_ID).unwrap() {
+        Err(AllovrError::InvalidAllovrTreasury.into())
     } else {
         Ok(())
     }
@@ -456,4 +469,35 @@ pub fn create_ata<'a>(
     )?;
 
     Ok(())
+}
+
+pub fn santitise_artist_data(args: RegisterArtistArgs) -> Result<RegisterArtistArgs, ProgramError> {
+    let artist_name = args.name.trim().to_string();
+    if artist_name.len() == 0 || artist_name.len() > ARTIST_METADATA_NAME_SIZE {
+        return Err(AllovrError::InvalidArtistName.into());
+    }
+
+    let artist_description = args.description.trim().to_string();
+    if artist_description.len() == 0 || artist_description.len() > ARTIST_METADATA_DESCRIPTION_SIZE {
+        return Err(AllovrError::InvalidArtistDescription.into());
+    }
+
+    let artist_token_symbol = args.token_symbol.trim().to_string();
+    if artist_token_symbol.len() != 3 && artist_token_symbol.len() != 4 {
+        return Err(AllovrError::InvalidArtistSymbol.into());
+    }    
+
+    let artist_image_url = args.image_url.trim().to_string();
+    if artist_image_url.len() > ARTIST_METADATA_IMAGE_URL_SIZE {
+        return Err(AllovrError::InvalidArtistImageUrl.into());
+    }
+
+    let response = RegisterArtistArgs {
+        name: artist_name,
+        description: artist_description,
+        token_symbol: artist_token_symbol,
+        image_url: artist_image_url,
+    };
+
+    Ok(response)
 }

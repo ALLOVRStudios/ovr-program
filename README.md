@@ -66,7 +66,7 @@ The following accounts are required:
 |Program    |ovRW7Yrq6Nqcz3GXnL4wexGZJeoJjRwo5EHdpWwLEDe|
 |State      |ALLSghdXR2TRNyrKhyGSNvqb55A6LqTUszcPLnoQ99Fw|
 |Mint       |Aovr4TdVH6qtZHcv4og6CLqn7gjNYtmDRQULYZSTz1Qf|
-|Givernance |ALLGnZikNaJQeN4KCAbDjZRSzvSefUdeTpk18yfizZvT|
+|Governance |ALLGnZikNaJQeN4KCAbDjZRSzvSefUdeTpk18yfizZvT|
 
 
 ## Build

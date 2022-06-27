@@ -19,9 +19,10 @@ pub const ARTWORK_METADATA_SEED_PREFIX: &'static str = "ALLOVRARTWORKMETA";
 pub const ARTWORK_ESCROW_SEED_PREFIX: &'static str = "ALLOVRARTWORKESCROW";
 
 // Known Addresses
-pub const ALLOVR_PROGRAM_ID: &'static str = "ovRW7Yrq6Nqcz3GXnL4wexGZJeoJjRwo5EHdpWwLEDe";
-pub const ALLOVR_MINT_ID: &'static str = "Aovr4TdVH6qtZHcv4og6CLqn7gjNYtmDRQULYZSTz1Qf";
-pub const ALLOVR_STATE_ID: &'static str = "ALLSghdXR2TRNyrKhyGSNvqb55A6LqTUszcPLnoQ99Fw";
+pub const ALLOVR_PROGRAM_ID: &'static str = "4ujXmUcCa8upcfy9u8CJsxoSfGRuTMw7eZvTxkPEH4Ae";
+pub const ALLOVR_MINT_ID: &'static str = "aLatNGiGQPRJrrHhQHp4Tm1YQFXy96RkFz5tHwvkMCt";
+pub const ALLOVR_STATE_ID: &'static str = "E8F1CqFC8KPgvuJWnymacUZG7DUMgsLn1sk7S2pUHxFw";
+pub const ALLOVR_AOVR_TREASURY_ID: &'static str = "717hQyAn4jf8bUdxeycBPaemCuF5KFoSmhKVzsdRYNBx";
 
 pub const ALL_DECIMAL_PLACES: u8 = 9;
 pub const MINT_SIZE: usize = 82;
@@ -34,8 +35,13 @@ pub const INFLATION_INTERVAL_IN_SECONDS: i64 = 604800; // seconds in a week (60 
 
 // Artist Metadata
 pub const ARTIST_METADATA_NAME_SIZE: usize = 50;
-pub const ARTIST_METADATA_COUNTRY_SIZE: usize = 50;
-pub const ARTIST_METADATA_SIZE: usize = ARTIST_METADATA_NAME_SIZE + ARTIST_METADATA_COUNTRY_SIZE;
+pub const ARTIST_METADATA_DESCRIPTION_SIZE: usize = 100;
+pub const ARTIST_METADATA_SYMBOL_SIZE: usize = 4;
+pub const ARTIST_METADATA_IMAGE_URL_SIZE: usize = 100;
+pub const ARTIST_METADATA_SIZE: usize = ARTIST_METADATA_NAME_SIZE
+    + ARTIST_METADATA_DESCRIPTION_SIZE
+    + ARTIST_METADATA_SYMBOL_SIZE
+    + ARTIST_METADATA_IMAGE_URL_SIZE;
 
 // Artwork Metadata
 pub const ARTWORK_METADATA_SYMBOL_SIZE: usize = 3;
@@ -47,4 +53,4 @@ pub const ARTWORK_METADATA_SIZE: usize = ARTWORK_METADATA_SYMBOL_SIZE + // Symbo
     size_of::<bool>() + size_of::<u64>() + // Option (Offer Price)    
     size_of::<bool>() + 1; //size_of::<Currency>(); // Option (Offer Currency);
 
-solana_program::declare_id!("Gtar23cBfE3i4myvvm4JAm5mQqgC5tXjTJiwJp4sWJTJ");
+solana_program::declare_id!("4ujXmUcCa8upcfy9u8CJsxoSfGRuTMw7eZvTxkPEH4Ae");

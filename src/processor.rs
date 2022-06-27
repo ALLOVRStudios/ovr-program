@@ -1,6 +1,4 @@
-use crate::{
-    error::AllovrError, instruction::AllovrInstruction, processors::mint_allovr, processors::*,
-};
+use crate::{error::AllovrError, instruction::AllovrInstruction, processors::*};
 use solana_program::borsh::try_from_slice_unchecked;
 
 use num_traits::FromPrimitive;
@@ -24,6 +22,10 @@ impl Processor {
             AllovrInstruction::MintAllovr => {
                 msg!("Mint ALLOVR Instruction");
                 mint_allovr::execute(accounts, program_id)
+            }
+            AllovrInstruction::RegisterArtist(args) => {
+                msg!("Register Artist Instruction");
+                register_artist::execute(accounts, program_id, args)
             }
         }
     }
@@ -51,7 +53,23 @@ impl PrintProgramError for AllovrError {
             AllovrError::InvalidAssociatedTokenAccount => msg!("Error: Invalid ATA"),
             AllovrError::InvalidClockSysvarId => msg!("Error: Invalid Clock Sysvar Id"),
             AllovrError::IncorrectTokenOwnerOrMint => msg!("Error: Incorrect Token Owner or Mint"),
+            // Artist
+            AllovrError::InvalidArtistTokenAccount => msg!("Error: Invalid Artist Token Account"),
+            AllovrError::InvalidArtistName => msg!("Error: Invalid Artist Name"),
+            AllovrError::InvalidArtistDescription => msg!("Error: Invalid Artist Description"),
+            AllovrError::InvalidArtistSymbol => msg!("Error: Invalid Artist Symbol"),
+            AllovrError::InvalidArtistImageUrl => msg!("Error: Invalid Artist Image Url"),
+            AllovrError::InvalidArtworkSymbol => msg!("Error: Invalid Artwork Symbol"),
+            AllovrError::ArtworkDescriptionMaxLengthExceeded => {
+                msg!("Error: Artwork Description Max Length Exceeded")
+            }
+            AllovrError::InvalidArtworkTokenAccount => msg!("Error: Invalid Artwork Token Account"),
             AllovrError::InvalidSystemProgramId => msg!("Error: Invalid System Program Id"),
+            AllovrError::ArtworkUnderOffer => msg!("Error: Artwork Under Offer"),
+            AllovrError::IncorrectArtworkBuyer => msg!("Error: Incorrect Artwork Buyer"),
+            AllovrError::IncorrectArtworkHolder => msg!("Error: Incorrect Artwork Holder"),
+            AllovrError::IncorrectPaymentAccount => msg!("Error: Incorrect Payment Account"),
+            AllovrError::InvalidOffer => msg!("Error: Invalid Offer"),
             AllovrError::InflationNotDue => msg!("Error: Inflation Not Due"),
             AllovrError::IncorrectFounderAddress => msg!("Error: Incorrect founder address"),
             AllovrError::ManualFail => msg!("MANUAL FAIL"),

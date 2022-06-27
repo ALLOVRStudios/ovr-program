@@ -16,3 +16,11 @@ pub struct AllovrTokenState {
     pub founder_7: Pubkey,
     pub founder_8: Pubkey,
 }
+
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
+pub struct ArtistMetadata {
+    pub name: String,
+    pub description: String,
+    pub symbol: String,
+    pub image_url: Option<String>,
+}
