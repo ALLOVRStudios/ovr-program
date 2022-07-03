@@ -27,6 +27,10 @@ impl Processor {
                 msg!("Register Artist Instruction");
                 register_artist::execute(accounts, program_id, args)
             }
+            AllovrInstruction::UpdateArtist(args) => {
+                msg!("Update Artist Instruction");
+                update_artist::execute(accounts, program_id, args)
+            }
         }
     }
 }

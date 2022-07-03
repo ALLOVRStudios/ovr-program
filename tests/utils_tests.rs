@@ -1,6 +1,5 @@
 mod ui_amount_to_amount_test {
-    use allovr_token::utils::ui_amount_to_amount;
-    use solana_program::msg;
+    use ovr_program::utils::ui_amount_to_amount;
     use solana_program_test::*;
     #[tokio::test]
     async fn test() {

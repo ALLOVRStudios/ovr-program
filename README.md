@@ -14,15 +14,17 @@ Currently the only available functionality is:
 ## Invoking functions.
 
 The first byte of the data parameter determines the function to be executed
+
 - 0 = init
 - 1 = mint
 - ...more to follow
 
 ## Init
 
-The init function can be invoked exactly once and only by the update authority of the OVR Program (present as signer). It creates the state and mint accounts used to store data about and mint the ALL token respectively. 
+The init function can be invoked exactly once and only by the update authority of the OVR Program (present as signer). It creates the state and mint accounts used to store data about and mint the ALL token respectively.
 
 The following accounts are required:
+
 - `[writable, signer]` Initator (program_id)
 - `[writable, signer]` State (PDA with seed prefix ALLOVRSTATE)
 - `[writable, signer]` Payer
@@ -30,13 +32,14 @@ The following accounts are required:
 - `[]` Mint Authority (PDA with seed prefix ALLOVRMINT)
 - `[]` Token Program
 - `[]` Rent Sysvar
-- `[]` System    
+- `[]` System
 
 Additionaly, the data parameter must contain the 4 founder ATA addresses that will be credited with ALL tokens on the first mint call.
 
 ## Mint
 
-Once initialised, the mint function can be executed (exactly once and only by the update authority of the OVR Program). Upon execution 100 000 000 ALL tokens will be minted to 
+Once initialised, the mint function can be executed (exactly once and only by the update authority of the OVR Program). Upon execution 100 000 000 ALL tokens will be minted to
+
 - A treasury account > 70% (70 000 000)
 - Founder 1 account > 7.5% (7 500 000)
 - Founder 2 account > 7.5% (7 500 000)
@@ -44,6 +47,7 @@ Once initialised, the mint function can be executed (exactly once and only by th
 - Founder 4 account > 7.5% (7 500 000)
 
 The following accounts are required:
+
 - `[signer]` Initator (program_id)
 - `[writable]` State (PDA with seed prefix ALLOVRSTATE)
 - `[writable, signer]` Payer
@@ -57,17 +61,16 @@ The following accounts are required:
 - `[]` Token Program
 - `[]` Rent Sysvar
 - `[]` Clock Sysvar
-- `[]` System    
+- `[]` System
 
 ## Known addresses
 
-|Account|Address                                     |
-|-----------|--------------------------------------------|
-|Program    |ovRW7Yrq6Nqcz3GXnL4wexGZJeoJjRwo5EHdpWwLEDe|
-|State      |ALLSghdXR2TRNyrKhyGSNvqb55A6LqTUszcPLnoQ99Fw|
-|Mint       |Aovr4TdVH6qtZHcv4og6CLqn7gjNYtmDRQULYZSTz1Qf|
-|Governance |ALLGnZikNaJQeN4KCAbDjZRSzvSefUdeTpk18yfizZvT|
-
+| Account    | Address                                      |
+| ---------- | -------------------------------------------- |
+| Program    | ovRW7Yrq6Nqcz3GXnL4wexGZJeoJjRwo5EHdpWwLEDe  |
+| State      | ALLSghdXR2TRNyrKhyGSNvqb55A6LqTUszcPLnoQ99Fw |
+| Mint       | Aovr4TdVH6qtZHcv4og6CLqn7gjNYtmDRQULYZSTz1Qf |
+| Governance | ALLGnZikNaJQeN4KCAbDjZRSzvSefUdeTpk18yfizZvT |
 
 ## Build
 
@@ -81,9 +84,16 @@ The following accounts are required:
 
     cargo test-bpf
 
-## Local development note
+## Local development note for Windows with Ubuntu Subsystem
+
 solana-test-validator -r (-r to clear data and start again)
 cargo build-bpf --manifest-path=./Cargo.toml --bpf-out-dir=/mnt/c/allovr_data/program
 solana program deploy /mnt/c/allovr_data/program/allovr_token.so
+
+## Local development note for MacOS
+
+solana-test-validator -r (-r to clear data and start again)
+cargo build-bpf --manifest-path=./Cargo.toml --bpf-out-dir=/Users/boskokovacevic/allovr_data/program
+solana program deploy /Users/boskokovacevic/allovr_data/program/ovr_program.so
 
 More coming soon.

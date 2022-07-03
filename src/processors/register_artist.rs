@@ -1,8 +1,7 @@
 use crate::instruction::RegisterArtistArgs;
 use crate::state::ArtistMetadata;
 use crate::{
-    error::AllovrError, utils::*, ALLOVR_MINT_ID, ARTIST_METADATA_DESCRIPTION_SIZE,
-    ARTIST_METADATA_IMAGE_URL_SIZE, ARTIST_METADATA_NAME_SIZE, ARTIST_METADATA_SEED_PREFIX,
+    error::AllovrError, utils::*, ALLOVR_MINT_ID, ARTIST_METADATA_SEED_PREFIX,
     ARTIST_METADATA_SIZE, ARTIST_SEED_PREFIX, MINT_SIZE,
 };
 
@@ -36,7 +35,7 @@ pub fn execute(
     accounts: &[AccountInfo],
     program_id: &Pubkey,
     args: RegisterArtistArgs,
-) -> ProgramResult {    
+) -> ProgramResult {
     let artist_data = santitise_artist_data(args)?;
     let rent = Rent::get()?;
 

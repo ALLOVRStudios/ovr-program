@@ -19,10 +19,10 @@ pub const ARTWORK_METADATA_SEED_PREFIX: &'static str = "ALLOVRARTWORKMETA";
 pub const ARTWORK_ESCROW_SEED_PREFIX: &'static str = "ALLOVRARTWORKESCROW";
 
 // Known Addresses
-pub const ALLOVR_PROGRAM_ID: &'static str = "4ujXmUcCa8upcfy9u8CJsxoSfGRuTMw7eZvTxkPEH4Ae";
-pub const ALLOVR_MINT_ID: &'static str = "aLatNGiGQPRJrrHhQHp4Tm1YQFXy96RkFz5tHwvkMCt";
-pub const ALLOVR_STATE_ID: &'static str = "E8F1CqFC8KPgvuJWnymacUZG7DUMgsLn1sk7S2pUHxFw";
-pub const ALLOVR_AOVR_TREASURY_ID: &'static str = "717hQyAn4jf8bUdxeycBPaemCuF5KFoSmhKVzsdRYNBx";
+pub const ALLOVR_PROGRAM_ID: &'static str = "9Le3FfZ7g6c11EzTtSWie45XLVp2La9AcFhFqWbBWMvs";
+pub const ALLOVR_MINT_ID: &'static str = "97hKUPwp1iG3NqKNko8yagkBH75voGptj4BBvj9Ccjdu";
+pub const ALLOVR_STATE_ID: &'static str = "AsLGvz3VzoTRFTa83sJD6xG57M8pEoP1sV4MsYhdyvsc";
+pub const ALLOVR_AOVR_TREASURY_ID: &'static str = "HBuFrepbLok3Q6UMiqbGanWed8YUgMNKGYrvSQ64n6jt";
 
 pub const ALL_DECIMAL_PLACES: u8 = 9;
 pub const MINT_SIZE: usize = 82;

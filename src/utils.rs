@@ -1,9 +1,9 @@
-use crate::ARTIST_METADATA_IMAGE_URL_SIZE;
-use crate::ARTIST_METADATA_DESCRIPTION_SIZE;
-use crate::ARTIST_METADATA_NAME_SIZE;
-use crate::instruction::RegisterArtistArgs;
 use crate::error::AllovrError;
+use crate::instruction::RegisterArtistArgs;
 use crate::ALL_DECIMAL_PLACES;
+use crate::ARTIST_METADATA_DESCRIPTION_SIZE;
+use crate::ARTIST_METADATA_IMAGE_URL_SIZE;
+use crate::ARTIST_METADATA_NAME_SIZE;
 use solana_program::account_info::AccountInfo;
 use solana_program::entrypoint::ProgramResult;
 use solana_program::msg;
@@ -16,6 +16,8 @@ use solana_program::system_instruction;
 use solana_program::sysvar::rent::Rent;
 use std::convert::TryInto;
 use std::str::FromStr;
+
+use mpl_token_metadata::instruction::create_metadata_accounts_v3;
 
 pub fn ui_amount_to_amount(aov: f64) -> u64 {
     spl_token::ui_amount_to_amount(aov, ALL_DECIMAL_PLACES)
@@ -369,7 +371,7 @@ pub fn created_associated_token_account<'a>(
     }
 
     let create_associated_token_account_ix =
-        spl_associated_token_account::create_associated_token_account(
+        spl_associated_token_account::instruction::create_associated_token_account(
             payer_account.key,
             owner_wallet_account.key,
             mint_account.key,
@@ -451,7 +453,7 @@ pub fn create_ata<'a>(
         return Err(error.into());
     }
 
-    let ix = spl_associated_token_account::create_associated_token_account(
+    let ix = spl_associated_token_account::instruction::create_associated_token_account(
         funding_account.key,
         wallet_account.key,
         spl_token_mint_account.key,
@@ -478,14 +480,15 @@ pub fn santitise_artist_data(args: RegisterArtistArgs) -> Result<RegisterArtistA
     }
 
     let artist_description = args.description.trim().to_string();
-    if artist_description.len() == 0 || artist_description.len() > ARTIST_METADATA_DESCRIPTION_SIZE {
+    if artist_description.len() == 0 || artist_description.len() > ARTIST_METADATA_DESCRIPTION_SIZE
+    {
         return Err(AllovrError::InvalidArtistDescription.into());
     }
 
     let artist_token_symbol = args.token_symbol.trim().to_string();
     if artist_token_symbol.len() != 3 && artist_token_symbol.len() != 4 {
         return Err(AllovrError::InvalidArtistSymbol.into());
-    }    
+    }
 
     let artist_image_url = args.image_url.trim().to_string();
     if artist_image_url.len() > ARTIST_METADATA_IMAGE_URL_SIZE {
@@ -500,4 +503,48 @@ pub fn santitise_artist_data(args: RegisterArtistArgs) -> Result<RegisterArtistA
     };
 
     Ok(response)
+}
+
+pub fn create_metaplex_metadata_account<'a>(
+    metadata_account: &AccountInfo<'a>,
+    mint_account: &AccountInfo<'a>,
+    artist_account: &AccountInfo<'a>,
+    meta_program_account: &AccountInfo<'a>,
+    rent_account: &AccountInfo<'a>,
+    name: String,
+    symbol: String,
+    uri: String,
+    signer_seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let cmda_instruction = create_metadata_accounts_v3(
+        mpl_token_metadata::ID,
+        *metadata_account.key,
+        *mint_account.key,
+        *mint_account.key,
+        *artist_account.key,
+        *artist_account.key,
+        name,
+        symbol,
+        uri,
+        None,
+        0,
+        true,
+        true,
+        None,
+        None,
+        None,
+    );
+
+    let metadata_infos = vec![
+        metadata_account.clone(),
+        mint_account.clone(),
+        artist_account.clone(),
+        meta_program_account.clone(),
+        rent_account.clone(),
+    ];
+
+    // // create meta data accounts
+    invoke_signed(&cmda_instruction, metadata_infos.as_slice(), signer_seeds)?;
+
+    Ok(())
 }
