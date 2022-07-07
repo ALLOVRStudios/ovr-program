@@ -20,7 +20,7 @@ pub struct RegisterArtistArgs {
     pub name: String,
     pub description: String,
     pub token_symbol: String,
-    pub image_url: String,
+    pub uri: Option<String>,
 }
 
 #[repr(C)]

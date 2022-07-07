@@ -30,6 +30,8 @@ pub enum AllovrError {
     InvalidProgramId,
     #[error("Invalid System Program ID")]
     InvalidSystemProgramId,
+    #[error("Invalid Metaplex Metadata Program ID")]
+    InvalidMetaplexMetadataProgramId,
     #[error("Invalid Clock Sysvar ID")]
     InvalidClockSysvarId,
     #[error("Invalid Artist Token Account")]
@@ -54,8 +56,8 @@ pub enum AllovrError {
     InvalidArtistDescription,
     #[error("Invalid Artist Symbol")]
     InvalidArtistSymbol,
-    #[error("Invalid Artist Image Url")]
-    InvalidArtistImageUrl,
+    #[error("Invalid Artist Uri")]
+    InvalidArtistUri,
 
     #[error("Artwork Under Offer")]
     ArtworkUnderOffer,

@@ -62,13 +62,16 @@ impl PrintProgramError for AllovrError {
             AllovrError::InvalidArtistName => msg!("Error: Invalid Artist Name"),
             AllovrError::InvalidArtistDescription => msg!("Error: Invalid Artist Description"),
             AllovrError::InvalidArtistSymbol => msg!("Error: Invalid Artist Symbol"),
-            AllovrError::InvalidArtistImageUrl => msg!("Error: Invalid Artist Image Url"),
+            AllovrError::InvalidArtistUri => msg!("Error: Invalid Artist Uri"),
             AllovrError::InvalidArtworkSymbol => msg!("Error: Invalid Artwork Symbol"),
             AllovrError::ArtworkDescriptionMaxLengthExceeded => {
                 msg!("Error: Artwork Description Max Length Exceeded")
             }
             AllovrError::InvalidArtworkTokenAccount => msg!("Error: Invalid Artwork Token Account"),
             AllovrError::InvalidSystemProgramId => msg!("Error: Invalid System Program Id"),
+            AllovrError::InvalidMetaplexMetadataProgramId => {
+                msg!("Error: Invalid Metaplex Metadata Program Id")
+            }
             AllovrError::ArtworkUnderOffer => msg!("Error: Artwork Under Offer"),
             AllovrError::IncorrectArtworkBuyer => msg!("Error: Incorrect Artwork Buyer"),
             AllovrError::IncorrectArtworkHolder => msg!("Error: Incorrect Artwork Holder"),

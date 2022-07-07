@@ -2,8 +2,9 @@ use crate::error::AllovrError;
 use crate::instruction::RegisterArtistArgs;
 use crate::ALL_DECIMAL_PLACES;
 use crate::ARTIST_METADATA_DESCRIPTION_SIZE;
-use crate::ARTIST_METADATA_IMAGE_URL_SIZE;
 use crate::ARTIST_METADATA_NAME_SIZE;
+use crate::ARTIST_METADATA_URI_SIZE;
+use mpl_token_metadata::state::DataV2;
 use solana_program::account_info::AccountInfo;
 use solana_program::entrypoint::ProgramResult;
 use solana_program::msg;
@@ -18,6 +19,7 @@ use std::convert::TryInto;
 use std::str::FromStr;
 
 use mpl_token_metadata::instruction::create_metadata_accounts_v3;
+use mpl_token_metadata::instruction::update_metadata_accounts_v2;
 
 pub fn ui_amount_to_amount(aov: f64) -> u64 {
     spl_token::ui_amount_to_amount(aov, ALL_DECIMAL_PLACES)
@@ -113,6 +115,14 @@ pub fn get_token_supply(mint: &AccountInfo) -> u64 {
 pub fn assert_signer(account_info: &AccountInfo) -> ProgramResult {
     if !account_info.is_signer {
         Err(AllovrError::MissingRequiredSignature.into())
+    } else {
+        Ok(())
+    }
+}
+
+pub fn assert_metaplex_program(account_info: &AccountInfo) -> ProgramResult {
+    if *account_info.key != mpl_token_metadata::ID {
+        Err(AllovrError::InvalidMetaplexMetadataProgramId.into())
     } else {
         Ok(())
     }
@@ -490,16 +500,21 @@ pub fn santitise_artist_data(args: RegisterArtistArgs) -> Result<RegisterArtistA
         return Err(AllovrError::InvalidArtistSymbol.into());
     }
 
-    let artist_image_url = args.image_url.trim().to_string();
-    if artist_image_url.len() > ARTIST_METADATA_IMAGE_URL_SIZE {
-        return Err(AllovrError::InvalidArtistImageUrl.into());
+    let mut artist_uri_option = None;
+    if args.uri.is_some() {
+        let artist_uri = args.uri.unwrap().trim().to_string();
+        if artist_uri.len() > ARTIST_METADATA_URI_SIZE {
+            return Err(AllovrError::InvalidArtistUri.into());
+        }
+
+        artist_uri_option = Some(artist_uri);
     }
 
     let response = RegisterArtistArgs {
         name: artist_name,
         description: artist_description,
         token_symbol: artist_token_symbol,
-        image_url: artist_image_url,
+        uri: artist_uri_option,
     };
 
     Ok(response)
@@ -514,7 +529,7 @@ pub fn create_metaplex_metadata_account<'a>(
     name: String,
     symbol: String,
     uri: String,
-    signer_seeds: &[&[&[u8]]],
+    signer_seeds: &[&[u8]],
 ) -> ProgramResult {
     let cmda_instruction = create_metadata_accounts_v3(
         mpl_token_metadata::ID,
@@ -522,7 +537,7 @@ pub fn create_metaplex_metadata_account<'a>(
         *mint_account.key,
         *mint_account.key,
         *artist_account.key,
-        *artist_account.key,
+        *mint_account.key,
         name,
         symbol,
         uri,
@@ -543,8 +558,56 @@ pub fn create_metaplex_metadata_account<'a>(
         rent_account.clone(),
     ];
 
-    // // create meta data accounts
-    invoke_signed(&cmda_instruction, metadata_infos.as_slice(), signer_seeds)?;
+    // create meta data accounts
+    invoke_signed(
+        &cmda_instruction,
+        metadata_infos.as_slice(),
+        &[signer_seeds],
+    )?;
+
+    Ok(())
+}
+
+pub fn update_metaplex_metadata_account<'a>(
+    metadata_account: &AccountInfo<'a>,
+    mint_account: &AccountInfo<'a>,
+    meta_program_account: &AccountInfo<'a>,
+    name: String,
+    symbol: String,
+    uri: String,
+    signer_seeds: &[&[u8]],
+) -> ProgramResult {
+    let data = DataV2 {
+        name: name,
+        symbol: symbol,
+        uri: uri,
+        seller_fee_basis_points: 0,
+        creators: None,
+        collection: None,
+        uses: None,
+    };
+
+    let cmda_instruction = update_metadata_accounts_v2(
+        mpl_token_metadata::ID,
+        *metadata_account.key,
+        *mint_account.key,
+        Some(*mint_account.key),
+        Some(data),
+        None,
+        Some(true),
+    );
+
+    let metadata_infos = vec![
+        metadata_account.clone(),
+        mint_account.clone(),
+        meta_program_account.clone(),
+        // rent_account.clone(),
+    ];
+    invoke_signed(
+        &cmda_instruction,
+        metadata_infos.as_slice(),
+        &[signer_seeds],
+    )?;
 
     Ok(())
 }

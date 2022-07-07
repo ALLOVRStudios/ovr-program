@@ -25,6 +25,8 @@ struct Accounts<'a, 'b: 'a> {
     artist_token_mint: &'a AccountInfo<'b>,
     artist_token_meta: &'a AccountInfo<'b>,
     treasury_aovr_token: &'a AccountInfo<'b>,
+    artist_token_metaplex_meta: &'a AccountInfo<'b>,
+    metaplex_meta_program_account: &'a AccountInfo<'b>,
     token_program: &'a AccountInfo<'b>,
     _associated_token_account_program: &'a AccountInfo<'b>,
     rent_sysvar: &'a AccountInfo<'b>,
@@ -93,7 +95,7 @@ pub fn execute(
         &a.artist_wallet,
         &a.rent_sysvar,
         signers_seeds,
-        2,
+        0,
     )?;
 
     //create ATA for new artist token for the artist
@@ -112,7 +114,6 @@ pub fn execute(
         &[artist_token_mint_bump],
     ];
 
-    // TODO: Remove locking the mint account and see if more can be minted
     // mint 10 000 000 artist tokens to artist
     mint_tokens_to(
         a.artist_token_mint,   // mint account (PDA)
@@ -120,7 +121,7 @@ pub fn execute(
         a.artist_artist_token, // artist assoicated token account
         &[mint_signer_seeds],
         10000000,
-        true,
+        false,
     )?;
 
     // Create artist Metadata account
@@ -152,17 +153,30 @@ pub fn execute(
     let mut metadata: ArtistMetadata =
         try_from_slice_unchecked(&a.artist_token_meta.data.borrow_mut())?;
 
-    metadata.name = artist_data.name;
-    metadata.description = artist_data.description;
-    metadata.symbol = artist_data.token_symbol;
-
-    if artist_data.image_url.len() == 0 {
-        metadata.image_url = None;
-    } else {
-        metadata.image_url = Some(artist_data.image_url);
-    }
+    metadata.name = String::from(&artist_data.name);
+    metadata.description = String::from(&artist_data.description);
+    metadata.symbol = String::from(&artist_data.token_symbol);
+    metadata.uri = artist_data.uri.clone();
 
     metadata.serialize(&mut &mut a.artist_token_meta.data.borrow_mut()[..])?;
+
+    let mut uri = String::new();
+    if !artist_data.uri.is_none() {
+        uri = artist_data.uri.unwrap();
+    }
+
+    create_metaplex_metadata_account(
+        &a.artist_token_metaplex_meta,
+        &a.artist_token_mint,
+        &a.artist_wallet,
+        &a.metaplex_meta_program_account,
+        &a.rent_sysvar,
+        String::from(&metadata.name),
+        String::from(&metadata.symbol),
+        uri,
+        signers_seeds,
+    )?;
+
     Ok(())
 }
 
@@ -178,6 +192,8 @@ fn parse_accounts<'a, 'b: 'a>(
         artist_token_mint: next_account_info(account_iter)?,
         artist_token_meta: next_account_info(account_iter)?,
         treasury_aovr_token: next_account_info(account_iter)?,
+        artist_token_metaplex_meta: next_account_info(account_iter)?,
+        metaplex_meta_program_account: next_account_info(account_iter)?,
         token_program: next_account_info(account_iter)?,
         _associated_token_account_program: next_account_info(account_iter)?,
         rent_sysvar: next_account_info(account_iter)?,
@@ -189,6 +205,7 @@ fn parse_accounts<'a, 'b: 'a>(
     assert_program_id(program_id)?;
     assert_signer(accounts.artist_wallet)?;
     assert_aovr_treasury(accounts.treasury_aovr_token.key)?;
+    assert_metaplex_program(accounts.metaplex_meta_program_account)?;
 
     let mint_key = Pubkey::from_str(ALLOVR_MINT_ID).unwrap();
 

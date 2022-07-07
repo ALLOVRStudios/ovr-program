@@ -22,5 +22,5 @@ pub struct ArtistMetadata {
     pub name: String,
     pub description: String,
     pub symbol: String,
-    pub image_url: Option<String>,
+    pub uri: Option<String>,
 }

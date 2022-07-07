@@ -14,7 +14,11 @@ use solana_program::{
 
 struct Accounts<'a, 'b: 'a> {
     artist_wallet: &'a AccountInfo<'b>,
+    artist_token_mint: &'a AccountInfo<'b>,
     artist_token_meta: &'a AccountInfo<'b>,
+    artist_token_metaplex_meta: &'a AccountInfo<'b>,
+    metaplex_meta_program_account: &'a AccountInfo<'b>,
+    _system: &'a AccountInfo<'b>,
 }
 
 pub fn execute(
@@ -51,14 +55,43 @@ pub fn execute(
     metadata.name = artist_data.name;
     metadata.description = artist_data.description;
     metadata.symbol = artist_data.token_symbol;
-
-    if artist_data.image_url.len() == 0 {
-        metadata.image_url = None;
-    } else {
-        metadata.image_url = Some(artist_data.image_url);
-    }
+    metadata.uri = artist_data.uri.clone();
 
     metadata.serialize(&mut &mut a.artist_token_meta.data.borrow_mut()[..])?;
+
+    let mut uri = String::new();
+    if !artist_data.uri.is_none() {
+        uri = artist_data.uri.unwrap();
+    }
+
+    // check the artist token mint PDA passed in is correct
+    let (_artist_token_mint_pda, artist_token_mint_bump) = assert_pda(
+        &a.artist_token_mint,
+        program_id,
+        &[
+            ARTIST_SEED_PREFIX.as_bytes(),
+            &a.artist_wallet.key.to_bytes(),
+        ],
+    )?;
+
+    let signers_seeds = &[
+        ARTIST_SEED_PREFIX.as_bytes(),
+        &a.artist_wallet.key.to_bytes(),
+        &[artist_token_mint_bump],
+    ];
+
+    // Update the Metaplex metadata for artist token so that wallets can show the token name, symbol and image
+
+    update_metaplex_metadata_account(
+        &a.artist_token_metaplex_meta,
+        &a.artist_token_mint,
+        &a.metaplex_meta_program_account,
+        String::from(&metadata.name),
+        String::from(&metadata.symbol),
+        uri,
+        signers_seeds,
+    )?;
+
     Ok(())
 }
 
@@ -69,9 +102,15 @@ fn parse_accounts<'a, 'b: 'a>(
     let account_iter = &mut accounts.iter();
     let accounts = Accounts {
         artist_wallet: next_account_info(account_iter)?,
+        artist_token_mint: next_account_info(account_iter)?,
         artist_token_meta: next_account_info(account_iter)?,
+        artist_token_metaplex_meta: next_account_info(account_iter)?,
+        metaplex_meta_program_account: next_account_info(account_iter)?,
+        _system: next_account_info(account_iter)?,
     };
     assert_program_id(program_id)?;
     assert_signer(accounts.artist_wallet)?;
+    assert_metaplex_program(accounts.metaplex_meta_program_account)?;
+
     Ok(accounts)
 }
