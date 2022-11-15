@@ -35,7 +35,6 @@ pub fn handle_register_staking_pool(
 
     let stake_pool = &mut ctx.accounts.stake_pool.load_init()?;
     stake_pool.staked = 0;
-    stake_pool.owed = 0;
 
     let stake_pool_info = StakePoolInfo {
         total_owed: 0,
@@ -45,8 +44,5 @@ pub fn handle_register_staking_pool(
 
     stake_pool_registry.pools[usize::from(pool_index)] = Some(stake_pool_info);
     stake_pool_registry.pool_head = pool_index + 1;
-
-    msg!("this is the stake pool {:?}", stake_pool_registry);
-
     Ok(())
 }

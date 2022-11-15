@@ -22,8 +22,6 @@ pub fn handle_initialise_staking(
     ctx: Context<InitialiseStakingRegistry>
 ) -> Result<()> {
     let stake_pool_registry = &mut ctx.accounts.stake_pool_registry.load_init()?;
-    stake_pool_registry.total_staked = 0;
-    stake_pool_registry.total_owed = 0;
-    stake_pool_registry.pool_head = 0;
+    stake_pool_registry.init();
     Ok(())
 }
