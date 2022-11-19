@@ -23,6 +23,10 @@ pub mod ovr_program {
         handle_mint_aovr(ctx)
     }
 
+    pub fn aovr_inflation_run(ctx: Context<AovrInflationRun>) -> Result<()> {
+        handle_aovr_inflation_run(ctx)
+    }
+
     pub fn initialise_staking(ctx: Context<InitialiseStakingRegistry>) -> Result<()> {
         handle_initialise_staking(ctx)
     }
@@ -52,5 +56,19 @@ pub mod ovr_program {
         pool_index: u8,
     ) -> Result<()> {
         handle_rebalance_staking_pool(ctx, pool_index)
+    }
+
+    pub fn request_stake_withdrawal(
+        ctx: Context<RequestStakeWithdrawal>,
+        amount: u64,
+    ) -> Result<()> {
+        handle_request_stake_withdrawal(ctx, amount)
+    }
+
+    pub fn cancel_stake_withdrawal(
+        ctx: Context<CancelStakeWithdrawal>,
+        
+    ) -> Result<()> {
+        handle_cancel_stake_withdrawal(ctx)
     }
 }

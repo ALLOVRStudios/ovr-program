@@ -7,18 +7,18 @@ use crate::state::{StakePool, StakePoolRegistry, StakePoolInfo};
 #[derive(Accounts)]
 #[instruction(pool_index: u8)]
 pub struct RegisterStakingPool<'info> {
-    #[account(
-        init, 
-        seeds = [ALLOVR_AOVR_STAKE_POOL_PREFIX.as_ref(), initialiser.key().as_ref(), &[pool_index.try_into().unwrap()]],
-        bump,
-        payer = initialiser, 
-        owner = *program_id, 
-        space = size_of::<StakePool>() + 16)]
-    stake_pool: AccountLoader<'info, StakePool>,
     #[account(mut, seeds = [ALLOVR_AOVR_STAKE_POOL_REGISTRY_PREFIX.as_ref()], bump)]
     stake_pool_registry: AccountLoader<'info, StakePoolRegistry>,
+    #[account(
+        init, 
+        seeds = [ALLOVR_AOVR_STAKE_POOL_PREFIX.as_ref(), payer.key().as_ref(), &[pool_index.try_into().unwrap()]],
+        bump,
+        payer = payer, 
+        owner = *program_id, 
+        space = size_of::<StakePool>() + 16)]
+    stake_pool: AccountLoader<'info, StakePool>,    
     #[account(mut)]
-    initialiser: Signer<'info>,
+    payer: Signer<'info>,
     system_program: Program<'info, System>,
 }
 

@@ -4,6 +4,9 @@ pub mod mint_aovr;
 pub mod rebalance_staking_pool;
 pub mod register_staking_pool;
 pub mod stake;
+pub mod aovr_inflation_run;
+pub mod request_stake_withdrawal;
+pub mod cancel_stake_withdrawal;
 
 pub use initialise_aovr::*;
 pub use initialise_staking::*;
@@ -11,3 +14,6 @@ pub use mint_aovr::*;
 pub use rebalance_staking_pool::*;
 pub use register_staking_pool::*;
 pub use stake::*;
+pub use aovr_inflation_run::*;
+pub use request_stake_withdrawal::*;
+pub use cancel_stake_withdrawal::*;

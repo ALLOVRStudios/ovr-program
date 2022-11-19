@@ -10,10 +10,6 @@ pub fn rebalance(
     stake_pool: &mut RefMut<StakePool>,
     pool_index: u8,
 ) -> Result<()> {
-    if stake_pool_registry.total_owed == 0 {
-        return Ok(());
-    }
-
     // check that pool_index points a registered pool
     let registered_pool_option = stake_pool_registry.pools[usize::from(pool_index)];
     require!(
@@ -38,8 +34,7 @@ pub fn rebalance(
     // update pool
     stake_pool.staked += registered_pool.total_owed;
 
-    stake_pool_registry.total_staked += registered_pool.total_owed;
-    stake_pool_registry.total_owed -= registered_pool.total_owed;
+    stake_pool_registry.total_staked += registered_pool.total_owed;    
 
     registered_pool.total_staked += registered_pool.total_owed;
     registered_pool.total_owed = 0;

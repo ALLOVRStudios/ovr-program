@@ -8,15 +8,13 @@ use anchor_lang::prelude::*;
 #[derive(Debug)]
 pub struct StakePoolRegistry {
     pub total_staked: u64,
-    pub total_owed: u64,
     pub pool_head: u8,
     pub pools: [Option<StakePoolInfo>; ALLOVR_AOVR_STAKE_NUM_POOLS],
 }
 
 impl StakePoolRegistry {
     pub fn init(&mut self) {
-        self.total_staked = 0;
-        self.total_owed = 0;
+        self.total_staked = 0;        
         self.pool_head = 0;
     }
 
@@ -69,8 +67,7 @@ impl From<RpcStakePoolInfo> for StakePoolInfo {
 
 #[account(zero_copy)]
 pub struct StakePool {
-    pub staked: u64,
-    // pub owed: u64,
+    pub total_staked: u64,    
     pub stakes: [u64; ALLOVR_AOVR_STAKE_NUM_STAKES_IN_POOL],
 }
 
@@ -95,6 +92,25 @@ impl StakeMetadata {
         self.slot_index = slot_index;
         self.withdrawal_request = 0;
         self.initialised_date = timestamp;
+        self.withdrawal_request_date = None;
+        Ok(())
+    }
+
+    pub fn request_withdrawal(&mut self,  amount: u64, timestamp: i64) -> Result<()> {        
+        require_neq!(
+            self.initialised_date,
+            0,
+            AllovrError::NoStakeExists
+        );
+
+        // don't care if there was already a withdrawal request, overwrite
+        self.withdrawal_request = amount;        
+        self.withdrawal_request_date = Some(timestamp);
+        Ok(())
+    }
+
+    pub fn cancel_withdrawal(&mut self) -> Result<()> {        
+        self.withdrawal_request = 0;        
         self.withdrawal_request_date = None;
         Ok(())
     }
