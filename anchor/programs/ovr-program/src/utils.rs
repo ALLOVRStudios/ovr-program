@@ -32,9 +32,9 @@ pub fn rebalance(
     }
 
     // update pool
-    stake_pool.staked += registered_pool.total_owed;
+    stake_pool.total_staked += registered_pool.total_owed;
 
-    stake_pool_registry.total_staked += registered_pool.total_owed;    
+    stake_pool_registry.total_staked += registered_pool.total_owed;
 
     registered_pool.total_staked += registered_pool.total_owed;
     registered_pool.total_owed = 0;

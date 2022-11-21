@@ -44,9 +44,9 @@ pub mod ovr_program {
     ) -> Result<()> {
         handle_stake(
             ctx,
+            amount,
             pool_index,
             slot_index,
-            amount,
             rebalance_pool_if_needed,
         )
     }
@@ -65,10 +65,7 @@ pub mod ovr_program {
         handle_request_stake_withdrawal(ctx, amount)
     }
 
-    pub fn cancel_stake_withdrawal(
-        ctx: Context<CancelStakeWithdrawal>,
-        
-    ) -> Result<()> {
+    pub fn cancel_stake_withdrawal(ctx: Context<CancelStakeWithdrawal>) -> Result<()> {
         handle_cancel_stake_withdrawal(ctx)
     }
 }

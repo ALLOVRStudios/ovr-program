@@ -4,6 +4,10 @@ use crate::{
 };
 use anchor_lang::prelude::*;
 
+/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ \\\
+/// Stake Pool Registry
+/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ \\\
+
 #[account(zero_copy)]
 #[derive(Debug)]
 pub struct StakePoolRegistry {
@@ -14,7 +18,7 @@ pub struct StakePoolRegistry {
 
 impl StakePoolRegistry {
     pub fn init(&mut self) {
-        self.total_staked = 0;        
+        self.total_staked = 0;
         self.pool_head = 0;
     }
 
@@ -65,11 +69,19 @@ impl From<RpcStakePoolInfo> for StakePoolInfo {
     }
 }
 
+/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ \\\
+/// Stake Pool
+/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ \\\
+
 #[account(zero_copy)]
 pub struct StakePool {
-    pub total_staked: u64,    
+    pub total_staked: u64,
     pub stakes: [u64; ALLOVR_AOVR_STAKE_NUM_STAKES_IN_POOL],
 }
+
+/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ \\\
+/// Stake
+/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ \\\
 
 #[account(zero_copy)]
 #[derive(AnchorSerialize, AnchorDeserialize, Default)]
@@ -96,25 +108,25 @@ impl StakeMetadata {
         Ok(())
     }
 
-    pub fn request_withdrawal(&mut self,  amount: u64, timestamp: i64) -> Result<()> {        
-        require_neq!(
-            self.initialised_date,
-            0,
-            AllovrError::NoStakeExists
-        );
+    pub fn request_withdrawal(&mut self, amount: u64, timestamp: i64) -> Result<()> {
+        require_neq!(self.initialised_date, 0, AllovrError::NoStakeExists);
 
         // don't care if there was already a withdrawal request, overwrite
-        self.withdrawal_request = amount;        
+        self.withdrawal_request = amount;
         self.withdrawal_request_date = Some(timestamp);
         Ok(())
     }
 
-    pub fn cancel_withdrawal(&mut self) -> Result<()> {        
-        self.withdrawal_request = 0;        
+    pub fn cancel_withdrawal(&mut self) -> Result<()> {
+        self.withdrawal_request = 0;
         self.withdrawal_request_date = None;
         Ok(())
     }
 }
+
+/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ \\\
+/// AOVR Token
+/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ \\\
 
 #[account]
 pub struct AllovrTokenState {

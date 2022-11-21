@@ -2,83 +2,85 @@
     "$schema": "http://json-schema.org/schema",
     "title": "ALLOVR Staking Data Accounts Schema",
     "description": "This schema is only used as a readme to describe the strucutre of the data stored within the various data accounts",
-    "stake_pool_registry": {
-        "type": "object",
-        "description": "The stake pool registry keeps a collection of all stake pools, each with their own staked/owed amount and Solana address",
-        "properties": {
-            "total_staked": {
-                "type": "number",
-                "description": "The amount of AOVR staked in total so far. This can include any inflation dividends"
-            },
-            "pool_head": {
-                "type": "number",
-                "description": "Starting at 0, when registering stake pools, this index is used to add the pool to the correct index"
-            },
-            "pools": {
-                "type": "array",
-                "description": "An array of stake pools, containing information about how much is stake, owed and the Solana address of the stake pool data account",
-                "items": {
-                    "type": "object",
-                    "descrption": "An array of stake pools, containing information about how much is stake, owed and the Solana address of the stake pool data account",
-                    "properties": {
-                        "total_staked": {
-                            "type": "number",
-                            "description": "The total amount of staked AOVR in this pool by all stake holders in pool"
-                        },
-                        "total_owed": {
-                            "type": "number",
-                            "description": "The total amount AOVR owed to all stake holders in pool. This value can only be set by the inflation run function. If this value is more than 0, a rebalancing is required before new stakes or withdrawals can be processed"
-                        },
-                        "pool_address": {
-                            "type": "string",
-                            "description": "The Solana address of the stake pool, needed to match the stake pool data account passed into functions, and to find stake balances"
+    "properties": {
+        "stake_pool_registry": {
+            "type": "object",
+            "description": "The stake pool registry keeps a collection of all stake pools, each with their own staked/owed amount and Solana address",
+            "properties": {
+                "total_staked": {
+                    "type": "number",
+                    "description": "The amount of AOVR staked in total so far. This can include any inflation dividends"
+                },
+                "pool_head": {
+                    "type": "number",
+                    "description": "Starting at 0, when registering stake pools, this index is used to add the pool to the correct index"
+                },
+                "pools": {
+                    "type": "array",
+                    "description": "An array of stake pools, containing information about how much is stake, owed and the Solana address of the stake pool data account",
+                    "items": {
+                        "type": "object",
+                        "descrption": "An array of stake pools, containing information about how much is stake, owed and the Solana address of the stake pool data account",
+                        "properties": {
+                            "total_staked": {
+                                "type": "number",
+                                "description": "The total amount of staked AOVR in this pool by all stake holders in pool"
+                            },
+                            "total_owed": {
+                                "type": "number",
+                                "description": "The total amount AOVR owed to all stake holders in pool. This value can only be set by the inflation run function. If this value is more than 0, a rebalancing is required before new stakes or withdrawals can be processed"
+                            },
+                            "pool_address": {
+                                "type": "string",
+                                "description": "The Solana address of the stake pool, needed to match the stake pool data account passed into functions, and to find stake balances"
+                            }
                         }
                     }
                 }
             }
-        }
-    },
-    "stake_pool": {
-        "type": "object",
-        "description": "The stake pool data containing information about total staked (to avoid having to enumerate all stakes every time), as well as an array of stakes representing the staked amount of each stake holder",
-        "properties": {
-            "total_staked": {
-                "type": "number",
-                "description": "The total amount staked within pool. This is denormalised for convenience and must alway equal the sum of all stakes in pool"
-            },
-            "stakes": {
-                "type": "array",
-                "maxItems": 100,
-                "itmes": {
+        },
+        "stake_pool": {
+            "type": "object",
+            "description": "The stake pool data containing information about total staked (to avoid having to enumerate all stakes every time), as well as an array of stakes representing the staked amount of each stake holder",
+            "properties": {
+                "total_staked": {
                     "type": "number",
-                    "descriptiom": "An array of nuimbers representing stakes. Each stake belongs to one stake holder, stake holders (a unique Solana wallet address) can only hold one stake"
+                    "description": "The total amount staked within pool. This is denormalised for convenience and must alway equal the sum of all stakes in pool"
+                },
+                "stakes": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "itmes": {
+                        "type": "number",
+                        "descriptiom": "An array of nuimbers representing stakes. Each stake belongs to one stake holder, stake holders (a unique Solana wallet address) can only hold one stake"
+                    }
                 }
             }
-        }
-    },
-    "stake": {
-        "type": "object",
-        "description": "Stores the pool_index and slot_index and withdrawal request data for a single stake holder. The address of this data account is a PDA including the stake holder wallet address, and controlled by the ovr-program. Only one stake account can be made per Solana wallet address",
-        "properties": {
-            "initialised_date": {
-                "type": "number",
-                "description": "unix timestamp representing the initialisation date of stake"
-            },
-            "pool_index": {
-                "type": "number",
-                "description": "The index of the pool in the stake_pool_registry pools array"
-            },
-            "slot_index": {
-                "type": "number",
-                "description": "The index of the stake in the stake_pool stakes array"
-            },
-            "withdrawal_request": {
-                "type": "number",
-                "description": "The amount to withdraw. Withdrawal must first be requested, and a waiting period (1 week) must be satisified before the AOVR can be withdrawn"
-            },
-            "withdrawal_request_date": {
-                "type": "number",
-                "description": "The unix timestamp representing the date the withdrawal request was made. Withdrawal must first be requested, and a waiting period (1 week) must be satisified before the AOVR can be withdrawn"
+        },
+        "stake": {
+            "type": "object",
+            "description": "Stores the pool_index and slot_index and withdrawal request data for a single stake holder. The address of this data account is a PDA including the stake holder wallet address, and controlled by the ovr-program. Only one stake account can be made per Solana wallet address",
+            "properties": {
+                "initialised_date": {
+                    "type": "number",
+                    "description": "unix timestamp representing the initialisation date of stake"
+                },
+                "pool_index": {
+                    "type": "number",
+                    "description": "The index of the pool in the stake_pool_registry pools array"
+                },
+                "slot_index": {
+                    "type": "number",
+                    "description": "The index of the stake in the stake_pool stakes array"
+                },
+                "withdrawal_request": {
+                    "type": "number",
+                    "description": "The amount to withdraw. Withdrawal must first be requested, and a waiting period (1 week) must be satisified before the AOVR can be withdrawn"
+                },
+                "withdrawal_request_date": {
+                    "type": "number",
+                    "description": "The unix timestamp representing the date the withdrawal request was made. Withdrawal must first be requested, and a waiting period (1 week) must be satisified before the AOVR can be withdrawn"
+                }
             }
         }
     }

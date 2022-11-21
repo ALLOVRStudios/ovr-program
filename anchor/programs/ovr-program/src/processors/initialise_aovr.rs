@@ -3,10 +3,8 @@ use anchor_spl::token::{SetAuthority, set_authority};
 use anchor_spl::token::spl_token::instruction::AuthorityType;
 use std::borrow::BorrowMut;
 use std::mem::size_of;
-use std::str::FromStr;
 use crate::constants::{ALLOVR_MINT_SEED_PREFIX, ALLOVR_AOVR_DECIMAL_PLACES};
-use crate::errors::AllovrError;
-use crate::known_addresses::{ALLOVR_STATE_ID, ALLOVR_MINT_ID, KnownAddress};
+use crate::known_addresses::KnownAddress;
 use crate::state::{ InitAovrArgs, AllovrTokenState};
 use anchor_spl::token::{ Token, Mint };
 

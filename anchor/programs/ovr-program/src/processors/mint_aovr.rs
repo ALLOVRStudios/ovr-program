@@ -1,16 +1,10 @@
-use crate::constants::{
-    ALLOVR_AOVR_DECIMAL_PLACES, ALLOVR_MINT_SEED_PREFIX, INFLATION_INTERVAL_IN_SECONDS,
-};
-use crate::errors::AllovrError;
+use crate::constants::{ALLOVR_MINT_SEED_PREFIX, INFLATION_INTERVAL_IN_SECONDS};
 use crate::known_addresses::KnownAddress;
-use crate::state::{AllovrTokenState, InitAovrArgs};
+use crate::state::AllovrTokenState;
 use anchor_lang::prelude::*;
-use anchor_spl::token::spl_token::instruction::AuthorityType;
-use anchor_spl::token::{mint_to, set_authority, MintTo, SetAuthority, TokenAccount};
+use anchor_spl::token::{mint_to, MintTo, TokenAccount};
 use anchor_spl::token::{Mint, Token};
 use std::borrow::BorrowMut;
-use std::mem::size_of;
-use std::str::FromStr;
 
 #[account]
 pub struct Auth {}

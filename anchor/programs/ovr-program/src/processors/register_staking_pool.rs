@@ -34,7 +34,7 @@ pub fn handle_register_staking_pool(
     require!(usize::from(pool_index) < ALLOVR_AOVR_STAKE_NUM_POOLS, AllovrError::InvalidPoolIndex);
 
     let stake_pool = &mut ctx.accounts.stake_pool.load_init()?;
-    stake_pool.staked = 0;
+    stake_pool.total_staked = 0;
 
     let stake_pool_info = StakePoolInfo {
         total_owed: 0,
