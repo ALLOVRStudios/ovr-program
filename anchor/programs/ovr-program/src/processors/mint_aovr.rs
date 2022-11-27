@@ -1,6 +1,7 @@
 use crate::constants::{ALLOVR_MINT_SEED_PREFIX, INFLATION_INTERVAL_IN_SECONDS};
 use crate::known_addresses::KnownAddress;
 use crate::state::AllovrTokenState;
+use crate::utils::ui_amount_to_amount;
 use anchor_lang::prelude::*;
 use anchor_spl::token::{mint_to, MintTo, TokenAccount};
 use anchor_spl::token::{Mint, Token};
@@ -15,7 +16,7 @@ pub struct MintAovr<'info> {
     aovr_state: Account<'info, AllovrTokenState>,
     #[account(mut, address = KnownAddress::allovr_mint(), mint::authority = mint_authority)]
     aovr_mint: Account<'info, Mint>,
-    #[account(seeds = [ALLOVR_MINT_SEED_PREFIX.as_ref()], bump)]
+    #[account(mut, seeds = [ALLOVR_MINT_SEED_PREFIX.as_ref()], bump)]
     mint_authority: Account<'info, Auth>,
     #[account(mut, token::mint = KnownAddress::allovr_mint())]
     aovr_treasury: Account<'info, TokenAccount>,
@@ -39,8 +40,20 @@ pub fn handle_mint_aovr(ctx: Context<MintAovr>) -> Result<()> {
         authority: ctx.accounts.mint_authority.to_account_info(),
     };
     let cpi_program = ctx.accounts.token_program.to_account_info();
-    let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
-    mint_to(cpi_ctx, 100_000_000)?;
+
+    let (_mint_authority, mint_authority_bump) =
+        Pubkey::find_program_address(&[ALLOVR_MINT_SEED_PREFIX.as_bytes()], ctx.program_id);
+
+    let mint_authority_bump_bytes = mint_authority_bump.to_le_bytes();
+    let seeds = vec![
+        ALLOVR_MINT_SEED_PREFIX.as_bytes(),
+        mint_authority_bump_bytes.as_ref(),
+    ];
+    let seeds = vec![seeds.as_slice()];
+    let seeds = seeds.as_slice();
+
+    let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, seeds);
+    mint_to(cpi_ctx, ui_amount_to_amount(100_000_000.0))?;
 
     Ok(())
 }

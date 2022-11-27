@@ -58,22 +58,20 @@ pub fn handle_aovr_inflation_run(ctx: Context<AovrInflationRun>) -> Result<()> {
 
     if total_staked > 0 {
         let third = weekly_inflation / 3;
-        recipients.push((
-            ctx.accounts.stake_pool_registry.to_account_info(),
-            third,
-        ));
-        recipients.push((
-            ctx.accounts.aovr_treasury.to_account_info(),
-            2 * third,
-        ));
-        
+        recipients.push((ctx.accounts.stake_pool_registry.to_account_info(), third));
+        recipients.push((ctx.accounts.aovr_treasury.to_account_info(), 2 * third));
+
         let total_staked = stake_pool_registry.total_staked;
         stake_pool_registry.total_staked = total_staked + third;
 
-        let mut i = 0;
-        while i < stake_pool_registry.pool_head {
-            let mut pool = stake_pool_registry.pools[i];
-            pool.total_owed = (pool.total_staked / total_staked) * third; 
+        let mut i: usize = 0;
+        let registered_pools_count = usize::from(stake_pool_registry.pool_head);
+        while i < registered_pools_count {
+            let pool_option = stake_pool_registry.pools[i];
+            require!(pool_option.is_some(), AllovrError::FatalError);
+            let mut pool = pool_option.unwrap();
+            pool.total_owed = (pool.total_staked / total_staked) * third;
+            stake_pool_registry.pools[i] = Some(pool);
             i = i + 1;
         }
     } else {

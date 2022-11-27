@@ -4,17 +4,14 @@ import { expect } from "chai";
 import { allovrMintKey, allovrStateKey } from "../test-keys/test-keys";
 import {
   awaitTransaction,
+  confirmInitialisedAllovrState,
   getFounders,
   getPda,
   getProgram,
   getRandomPayer,
 } from "../base_test";
-import {
-  ALLOVR_AOVR_DECIMAL_PLACES,
-  ALLOVR_MINT_SEED_PREFIX,
-  COST_INIT_AOVR,
-} from "../constants";
-import { getMint, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { ALLOVR_MINT_SEED_PREFIX, COST_INIT_AOVR } from "../constants";
+import { getMint, Mint, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 const tryInitialise = async (): Promise<{
   success: boolean;
@@ -56,7 +53,6 @@ const tryInitialise = async (): Promise<{
       allovrMintAuthorityPubkey: mintAuthorityPda,
     };
   } catch (error) {
-    console.error(error);
     return { success: false, error };
   }
 };
@@ -77,27 +73,32 @@ describe("Initialise AOVR", () => {
       allovrStatePubkey
     );
 
-    expect(allovrState.inflationRunCount).eq(0);
-    expect(allovrState.nextInflationDue.toNumber()).eq(0);
-    expect(allovrState.minted).false;
-    expect(allovrState.founder1.equals(founders.founder1)).true;
-    expect(allovrState.founder2.equals(founders.founder2)).true;
-    expect(allovrState.founder3.equals(founders.founder3)).true;
-    expect(allovrState.founder4.equals(founders.founder4)).true;
-    expect(allovrState.founder5.equals(founders.founder5)).true;
-    expect(allovrState.founder6.equals(founders.founder6)).true;
-    expect(allovrState.founder7.equals(founders.founder7)).true;
-    expect(allovrState.founder8.equals(founders.founder8)).true;
-
     const mintInfo = await getMint(
       program.provider.connection,
       allovrMintPubkey
     );
 
-    expect(mintInfo.mintAuthority.equals(allovrMintAuthorityPubkey));
-    expect(mintInfo.decimals).eq(ALLOVR_AOVR_DECIMAL_PLACES);
-    expect(mintInfo.freezeAuthority).null;
-    expect(mintInfo.isInitialized).true;
-    expect(mintInfo.supply).eq(BigInt(0));
+    confirmInitialisedAllovrState(allovrState, founders, mintInfo);
+  });
+
+  it(`Fails to initialise a second time`, async () => {
+    const { success } = await tryInitialise();
+    expect(success).false;
+
+    const allovrStateKeypair = allovrStateKey();
+
+    const allovrState = await program.account.allovrTokenState.fetch(
+      allovrStateKeypair.publicKey
+    );
+
+    // check nothing changed
+    const allovrMintKeypair = allovrMintKey();
+
+    const mintInfo = await getMint(
+      program.provider.connection,
+      allovrMintKeypair.publicKey
+    );
+
+    confirmInitialisedAllovrState(allovrState, founders, mintInfo);
   });
 });

@@ -4,34 +4,37 @@ import { expect } from "chai";
 import {
   allovrAovrTreasury,
   allovrMintKey,
-  allovrSolTreasury,
   allovrStateKey,
 } from "../test-keys/test-keys";
 import {
   awaitTransaction,
+  checkFounderHaveNotChaged,
+  checkMint,
   getFounders,
   getPda,
   getProgram,
   getRandomPayer,
   initialiseAllovrTreasury,
 } from "../base_test";
-import { ALLOVR_MINT_SEED_PREFIX, COST_INIT_AOVR } from "../constants";
 import {
-  createAssociatedTokenAccountInstruction,
-  createInitializeMintInstruction,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+  ALLOVR_AOVR_DECIMAL_PLACES,
+  ALLOVR_MINT_SEED_PREFIX,
+  COST_INIT_AOVR,
+  INFLATION_INTERVAL_IN_SECONDS,
+} from "../constants";
+import { getMint, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 const tryMint = async (): Promise<{
   success: boolean;
   allovrStatePubkey?: anchor.web3.PublicKey;
+  allovrAovrTreasuryAta?: anchor.web3.PublicKey;
+  allovrMint?: anchor.web3.PublicKey;
   error?: any;
 }> => {
   const program = getProgram();
   const payer = await getRandomPayer(COST_INIT_AOVR);
   const allovrStateKeypair = allovrStateKey();
   const allovrMintKeypair = allovrMintKey();
-  const allovrSolTreasuryKeypair = allovrSolTreasury();
   const allovrAovrTreasuryAta = await allovrAovrTreasury();
 
   try {
@@ -56,7 +59,12 @@ const tryMint = async (): Promise<{
 
     await awaitTransaction(txSignature);
 
-    return { success: true, allovrStatePubkey: allovrStateKeypair.publicKey };
+    return {
+      success: true,
+      allovrStatePubkey: allovrStateKeypair.publicKey,
+      allovrAovrTreasuryAta,
+      allovrMint: allovrMintKeypair.publicKey,
+    };
   } catch (error) {
     console.error(error);
     return { success: false, error };
@@ -68,14 +76,44 @@ describe("Mint AOVR", () => {
     const program = getProgram();
     const founders = getFounders();
     await initialiseAllovrTreasury();
-    const { success, allovrStatePubkey } = await tryMint();
+    const { success, allovrStatePubkey, allovrAovrTreasuryAta, allovrMint } =
+      await tryMint();
+
     expect(success).true;
-    const allovrAovrTreasuryAta = await allovrAovrTreasury();
-    const y = await program.provider.connection.getTokenAccountBalance(
-      allovrAovrTreasuryAta
+
+    const allovrAovrTreasuryBalance =
+      await program.provider.connection.getTokenAccountBalance(
+        allovrAovrTreasuryAta
+      );
+
+    expect(allovrAovrTreasuryBalance.value.uiAmount).eq(100_000_000);
+    expect(allovrAovrTreasuryBalance.value.decimals).eq(
+      ALLOVR_AOVR_DECIMAL_PLACES
     );
 
-    console.log("This is the AOVR treasury");
-    console.log(y);
+    const allovrState = await program.account.allovrTokenState.fetch(
+      allovrStatePubkey
+    );
+
+    checkFounderHaveNotChaged(allovrState, getFounders());
+
+    const mintInfo = await getMint(program.provider.connection, allovrMint);
+    checkMint(mintInfo, 100_000_000);
+
+    expect(allovrState.minted).true;
+
+    const unixTimestampNow = Math.floor(new Date().getTime() / 1000);
+    const estimateNextInflationRun =
+      unixTimestampNow + INFLATION_INTERVAL_IN_SECONDS;
+
+    expect(
+      allovrState.nextInflationDue.gt(
+        new anchor.BN(estimateNextInflationRun - 10)
+      )
+    ).true;
+
+    expect(
+      allovrState.nextInflationDue.lt(new anchor.BN(estimateNextInflationRun))
+    ).true;
   });
 });

@@ -1,9 +1,8 @@
-use std::cell::RefMut;
-
-use crate::constants::ALLOVR_AOVR_STAKE_NUM_STAKES_IN_POOL;
+use crate::constants::{ALLOVR_AOVR_DECIMAL_PLACES, ALLOVR_AOVR_STAKE_NUM_STAKES_IN_POOL};
 use crate::errors::AllovrError;
 use crate::state::{StakePool, StakePoolRegistry};
 use anchor_lang::prelude::*;
+use std::cell::RefMut;
 
 pub fn rebalance(
     stake_pool_registry: &mut RefMut<StakePoolRegistry>,
@@ -40,4 +39,8 @@ pub fn rebalance(
     registered_pool.total_owed = 0;
 
     Ok(())
+}
+
+pub fn ui_amount_to_amount(aovr: f64) -> u64 {
+    spl_token::ui_amount_to_amount(aovr, ALLOVR_AOVR_DECIMAL_PLACES)
 }

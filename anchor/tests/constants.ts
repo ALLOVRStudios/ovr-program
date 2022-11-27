@@ -17,6 +17,8 @@ export const ALLOVR_AOVR_DECIMAL_PLACES = 9;
 export const ALLOVR_AOVR_STAKE_NUM_POOLS = 100;
 export const ALLOVR_AOVR_STAKE_NUM_STAKES_IN_POOL = 100;
 
+export const INFLATION_INTERVAL_IN_SECONDS = 604800; // 1 week
+
 export const FOUNDER_1 = "4hwotd4U1obdNgSTdDRmgCciRtpA2RnKgUMXvaNG3UcL";
 export const FOUNDER_2 = "2NZQvXp2WH3C7QGaGqZkgdPHQ6NA5HxfFShQk3BZ4hos";
 export const FOUNDER_3 = "CHjMvtft2fXfZtG3j7g6XrjwRGLEbL12cQ4JZJkmgCZh";

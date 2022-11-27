@@ -39,5 +39,8 @@ pub enum AllovrError {
     #[msg("AOVR inflation not due")]
     AovrInflationNotDue,
     #[msg("Insufficient AOVR balance")]
-    InsufficientAovrBalance
+    InsufficientAovrBalance,
+    // This is reserved for situations that should never happen, like finding that the head of the pool registry no longer points to the correct pool index
+    #[msg("Fatal Error")]
+    FatalError,
 }

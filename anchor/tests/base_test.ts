@@ -1,8 +1,15 @@
 import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
-import { createAssociatedTokenAccountInstruction } from "@solana/spl-token";
+import { utf8 } from "@project-serum/anchor/dist/cjs/utils/bytes";
+import {
+  createAssociatedTokenAccountInstruction,
+  Mint,
+} from "@solana/spl-token";
+import { expect } from "chai";
 import { OvrProgram } from "../target/types/ovr_program";
 import {
+  ALLOVR_AOVR_DECIMAL_PLACES,
+  ALLOVR_MINT_SEED_PREFIX,
   FOUNDER_1,
   FOUNDER_2,
   FOUNDER_3,
@@ -54,10 +61,8 @@ export const getPda = async (
   seeds: (Buffer | Uint8Array)[]
 ): Promise<anchor.web3.PublicKey> => {
   const programId = getProgram().programId;
-  const [stakePoolRegistryPda] = await anchor.web3.PublicKey.findProgramAddress(
-    seeds,
-    programId
-  );
+  const [stakePoolRegistryPda, bump] =
+    await anchor.web3.PublicKey.findProgramAddress(seeds, programId);
 
   return stakePoolRegistryPda;
 };
@@ -76,7 +81,17 @@ export const awaitTransaction = async (
   });
 };
 
-export const getFounders = () => ({
+export type FoundersList = {
+  founder1: anchor.web3.PublicKey;
+  founder2: anchor.web3.PublicKey;
+  founder3: anchor.web3.PublicKey;
+  founder4: anchor.web3.PublicKey;
+  founder5: anchor.web3.PublicKey;
+  founder6: anchor.web3.PublicKey;
+  founder7: anchor.web3.PublicKey;
+  founder8: anchor.web3.PublicKey;
+};
+export const getFounders = (): FoundersList => ({
   founder1: new anchor.web3.PublicKey(FOUNDER_1),
   founder2: new anchor.web3.PublicKey(FOUNDER_2),
   founder3: new anchor.web3.PublicKey(FOUNDER_3),
@@ -105,9 +120,6 @@ export const initialiseAllovrTreasury = async () => {
     signature: airdropSignature,
   });
 
-  console.log("Creating ATA");
-
-  // Fires a list of instructions
   const mint_tx = new anchor.web3.Transaction().add(
     createAssociatedTokenAccountInstruction(
       treasury.publicKey,
@@ -117,9 +129,40 @@ export const initialiseAllovrTreasury = async () => {
     )
   );
 
-  // sends and create the transaction
-  const res = await program.provider.sendAndConfirm(mint_tx, [treasury]);
+  await program.provider.sendAndConfirm(mint_tx, [treasury]);
+};
 
-  console.log("This is the respo");
-  console.log(res);
+export const checkFounderHaveNotChaged = (
+  allovrState: any,
+  founders: FoundersList
+) => {
+  expect(allovrState.founder1.equals(founders.founder1)).true;
+  expect(allovrState.founder2.equals(founders.founder2)).true;
+  expect(allovrState.founder3.equals(founders.founder3)).true;
+  expect(allovrState.founder4.equals(founders.founder4)).true;
+  expect(allovrState.founder5.equals(founders.founder5)).true;
+  expect(allovrState.founder6.equals(founders.founder6)).true;
+  expect(allovrState.founder7.equals(founders.founder7)).true;
+  expect(allovrState.founder8.equals(founders.founder8)).true;
+};
+
+export const checkMint = async (mintInfo: Mint, supply: number) => {
+  const mintAuthorityPda = await getPda([utf8.encode(ALLOVR_MINT_SEED_PREFIX)]);
+  expect(mintInfo.mintAuthority.equals(mintAuthorityPda));
+  expect(mintInfo.decimals).eq(ALLOVR_AOVR_DECIMAL_PLACES);
+  expect(mintInfo.freezeAuthority).null;
+  expect(mintInfo.isInitialized).true;
+  expect(mintInfo.supply).eq(BigInt(supply));
+};
+
+export const confirmInitialisedAllovrState = (
+  allovrState: any,
+  founders: FoundersList,
+  mintInfo: Mint
+) => {
+  checkFounderHaveNotChaged(allovrState, founders);
+  expect(allovrState.inflationRunCount).eq(0);
+  expect(allovrState.nextInflationDue.toNumber()).eq(0);
+  expect(allovrState.minted).false;
+  checkMint(mintInfo, 0);
 };

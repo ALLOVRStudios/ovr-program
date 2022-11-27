@@ -1,11 +1,9 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{SetAuthority, set_authority};
-use anchor_spl::token::spl_token::instruction::AuthorityType;
 use std::borrow::BorrowMut;
 use std::mem::size_of;
 use crate::constants::{ALLOVR_MINT_SEED_PREFIX, ALLOVR_AOVR_DECIMAL_PLACES};
 use crate::known_addresses::KnownAddress;
-use crate::state::{ InitAovrArgs, AllovrTokenState};
+use crate::state::{InitAovrArgs, AllovrTokenState};
 use anchor_spl::token::{ Token, Mint };
 
 #[account]
@@ -25,7 +23,7 @@ pub struct InitialiseAovr<'info> {
         address = KnownAddress::allovr_mint(),
         payer = initialiser,
         mint::decimals = ALLOVR_AOVR_DECIMAL_PLACES,
-        mint::authority = initialiser,
+        mint::authority = mint_authority,
     )]
     aovr_mint: Account<'info, Mint>,
     #[account(
@@ -61,20 +59,5 @@ pub fn handle_initialise_aovr(
     aovr_state.founder_6 = founders.founder_6;
     aovr_state.founder_7 = founders.founder_7;
     aovr_state.founder_8 = founders.founder_8;
-
-    // set mint authority
-    let cpi_program = ctx.accounts.token_program.to_account_info();
-    let cpi_accounts = SetAuthority {
-        account_or_mint: ctx.accounts.aovr_mint.to_account_info(),
-        current_authority: ctx.accounts.initialiser.to_account_info(),
-    };
-
-    let seeds = vec![ALLOVR_MINT_SEED_PREFIX.as_bytes()];
-    let seeds = vec![seeds.as_slice()];
-    let seeds = seeds.as_slice();
-
-    let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, seeds);
-    set_authority(cpi_ctx, AuthorityType::MintTokens, Some(ctx.accounts.mint_authority.key()))?;
-
     Ok(())
 }
