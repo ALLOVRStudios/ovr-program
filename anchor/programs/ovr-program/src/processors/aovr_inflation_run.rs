@@ -36,7 +36,7 @@ pub struct AovrInflationRun<'info> {
 pub fn handle_aovr_inflation_run(ctx: Context<AovrInflationRun>) -> Result<()> {
     let aovr_state = ctx.accounts.aovr_state.borrow_mut();
 
-    require!(!aovr_state.minted, AllovrError::AovrNotMinted);
+    require!(aovr_state.minted, AllovrError::AovrNotMinted);
     require!(
         ctx.accounts.clock.unix_timestamp < aovr_state.next_inflation_due,
         AllovrError::AovrInflationNotDue
@@ -57,16 +57,25 @@ pub fn handle_aovr_inflation_run(ctx: Context<AovrInflationRun>) -> Result<()> {
     let total_staked = stake_pool_registry.total_staked;
 
     if total_staked > 0 {
+        let third = weekly_inflation / 3;
         recipients.push((
             ctx.accounts.stake_pool_registry.to_account_info(),
-            weekly_inflation / 2,
+            third,
         ));
         recipients.push((
             ctx.accounts.aovr_treasury.to_account_info(),
-            weekly_inflation / 2,
+            2 * third,
         ));
+        
+        let total_staked = stake_pool_registry.total_staked;
+        stake_pool_registry.total_staked = total_staked + third;
 
-        // let stake_pool_registry = &mut ctx.accounts.stake_pool_registry.load_mut()?;
+        let mut i = 0;
+        while i < stake_pool_registry.pool_head {
+            let mut pool = stake_pool_registry.pools[i];
+            pool.total_owed = (pool.total_staked / total_staked) * third; 
+            i = i + 1;
+        }
     } else {
         recipients.push((
             ctx.accounts.aovr_treasury.to_account_info(),
@@ -84,18 +93,6 @@ pub fn handle_aovr_inflation_run(ctx: Context<AovrInflationRun>) -> Result<()> {
         let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
         mint_to(cpi_ctx, r.1)?;
     }
-
-    // the rest goes to DAO treasury
-
-    // let founder_share = weekly_inflation / 8;
-    // let treaasury_share = weekly_inflation / 2;
-    // let recipients: Vec<(&AccountInfo, u64)> = vec![
-    //     (a.treasury_token, treaasury_share),
-    //     (a.founder_1_token, founder_share),
-    //     (a.founder_2_token, founder_share),
-    //     (a.founder_3_token, founder_share),
-    //     (a.founder_4_token, founder_share),
-    // ];
 
     Ok(())
 }
