@@ -96,4 +96,11 @@ solana-test-validator -r (-r to clear data and start again)
 cargo build-bpf --manifest-path=./Cargo.toml --bpf-out-dir=/Users/boskokovacevic/allovr_data/program
 solana program deploy /Users/boskokovacevic/allovr_data/program/ovr_program.so
 
-More coming soon.
+# ovr-program Deploy process
+
+1. Get the JSON version of the ovr-program upgrade authority key and put it into the key folder (solana config get) /Users/boskokovacevic/.config/solana/id.json
+2. Get the JSON version of the ovr-program key and place it in /Users/boskokovacevic/allovr_data/program/ovr_program-keypair.json
+3. cargo build-bpf --manifest-path=./Cargo.toml --bpf-out-dir=/Users/boskokovacevic/allovr_data/program
+4. solana program deploy /Users/boskokovacevic/allovr_data/program/ovr_program.so
+
+solana program deploy /Users/boskokovacevic/allovr_data/program/spl_governance.so

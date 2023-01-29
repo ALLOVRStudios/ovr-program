@@ -68,4 +68,10 @@ pub mod ovr_program {
     pub fn cancel_stake_withdrawal(ctx: Context<CancelStakeWithdrawal>) -> Result<()> {
         handle_cancel_stake_withdrawal(ctx)
     }
+
+    /// TEST SECTION - Remove Before Deploy
+    ///
+    pub fn test_update_inflation_run(ctx: Context<TestUpdateInflationRun>) -> Result<()> {
+        handle_test_update_inflation_run(ctx)
+    }
 }

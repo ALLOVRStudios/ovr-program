@@ -36,6 +36,7 @@ const tryMint = async (): Promise<{
   const allovrStateKeypair = allovrStateKey();
   const allovrMintKeypair = allovrMintKey();
   const allovrAovrTreasuryAta = await allovrAovrTreasury();
+  let success = true;
 
   try {
     const mintAuthorityPda = await getPda([
@@ -58,23 +59,22 @@ const tryMint = async (): Promise<{
       .rpc();
 
     await awaitTransaction(txSignature);
-
-    return {
-      success: true,
-      allovrStatePubkey: allovrStateKeypair.publicKey,
-      allovrAovrTreasuryAta,
-      allovrMint: allovrMintKeypair.publicKey,
-    };
   } catch (error) {
-    console.error(error);
-    return { success: false, error };
+    success = false;
   }
+
+  return {
+    success,
+    allovrStatePubkey: allovrStateKeypair.publicKey,
+    allovrAovrTreasuryAta,
+    allovrMint: allovrMintKeypair.publicKey,
+  };
 };
 
 describe("Mint AOVR", () => {
   it(`Mints`, async () => {
     const program = getProgram();
-    const founders = getFounders();
+
     await initialiseAllovrTreasury();
     const { success, allovrStatePubkey, allovrAovrTreasuryAta, allovrMint } =
       await tryMint();
@@ -98,7 +98,54 @@ describe("Mint AOVR", () => {
     checkFounderHaveNotChaged(allovrState, getFounders());
 
     const mintInfo = await getMint(program.provider.connection, allovrMint);
-    checkMint(mintInfo, 100_000_000);
+    await checkMint(mintInfo, "100000000000000000");
+
+    expect(allovrState.minted).true;
+
+    const unixTimestampNow = Math.floor(new Date().getTime() / 1000);
+    const estimateNextInflationRun =
+      unixTimestampNow + INFLATION_INTERVAL_IN_SECONDS;
+
+    expect(
+      allovrState.nextInflationDue.gt(
+        new anchor.BN(estimateNextInflationRun - 10)
+      )
+    ).true;
+
+    expect(
+      allovrState.nextInflationDue.lt(new anchor.BN(estimateNextInflationRun))
+    ).true;
+
+    console.log("--- ALLOVR State ---");
+    console.table(allovrState);
+
+    console.log("--- ALLOVR AOVR Mint ---");
+    console.table(mintInfo);
+  });
+
+  it(`Fails to mint a second time`, async () => {
+    const program = getProgram();
+
+    const { success, allovrStatePubkey, allovrAovrTreasuryAta, allovrMint } =
+      await tryMint();
+
+    expect(success).false;
+
+    const allovrAovrTreasuryBalance =
+      await program.provider.connection.getTokenAccountBalance(
+        allovrAovrTreasuryAta
+      );
+
+    expect(allovrAovrTreasuryBalance.value.uiAmount).eq(100_000_000);
+
+    const allovrState = await program.account.allovrTokenState.fetch(
+      allovrStatePubkey
+    );
+
+    checkFounderHaveNotChaged(allovrState, getFounders());
+
+    const mintInfo = await getMint(program.provider.connection, allovrMint);
+    checkMint(mintInfo, "100000000000000000");
 
     expect(allovrState.minted).true;
 

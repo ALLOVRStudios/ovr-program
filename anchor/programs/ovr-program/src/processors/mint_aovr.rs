@@ -1,4 +1,5 @@
 use crate::constants::{ALLOVR_MINT_SEED_PREFIX, INFLATION_INTERVAL_IN_SECONDS};
+use crate::errors::AllovrError;
 use crate::known_addresses::KnownAddress;
 use crate::state::AllovrTokenState;
 use crate::utils::ui_amount_to_amount;
@@ -14,14 +15,19 @@ pub struct Auth {}
 pub struct MintAovr<'info> {
     #[account(mut, address = KnownAddress::allovr_state(), constraint = aovr_state.to_account_info().owner == program_id)]
     aovr_state: Account<'info, AllovrTokenState>,
+
     #[account(mut, address = KnownAddress::allovr_mint(), mint::authority = mint_authority)]
     aovr_mint: Account<'info, Mint>,
+
     #[account(mut, seeds = [ALLOVR_MINT_SEED_PREFIX.as_ref()], bump)]
     mint_authority: Account<'info, Auth>,
-    #[account(mut, token::mint = KnownAddress::allovr_mint())]
+
+    #[account(mut, token::mint = KnownAddress::allovr_mint(), address = KnownAddress::allovr_dao_aovr_treasury())]
     aovr_treasury: Account<'info, TokenAccount>,
+
     #[account(mut)]
     initialiser: Signer<'info>,
+
     token_program: Program<'info, Token>,
     system_program: Program<'info, System>,
     clock: Sysvar<'info, Clock>,
@@ -29,6 +35,8 @@ pub struct MintAovr<'info> {
 
 pub fn handle_mint_aovr(ctx: Context<MintAovr>) -> Result<()> {
     let aovr_state = ctx.accounts.aovr_state.borrow_mut();
+
+    require!(aovr_state.minted == false, AllovrError::AovrAlreadyMinted);
 
     aovr_state.minted = true;
     aovr_state.next_inflation_due =

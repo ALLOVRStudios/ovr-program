@@ -16,18 +16,25 @@ pub struct Auth {}
 pub struct AovrInflationRun<'info> {
     #[account(mut, address = KnownAddress::allovr_state(), constraint = aovr_state.to_account_info().owner == program_id)]
     aovr_state: Account<'info, AllovrTokenState>,
+
     #[account(mut, address = KnownAddress::allovr_mint(), mint::authority = mint_authority)]
     aovr_mint: Account<'info, Mint>,
-    #[account(seeds = [ALLOVR_MINT_SEED_PREFIX.as_ref()], bump)]
+
+    #[account(mut, seeds = [ALLOVR_MINT_SEED_PREFIX.as_ref()], bump)]
     mint_authority: Account<'info, Auth>,
+
     #[account(mut, token::mint = KnownAddress::allovr_mint(), address = KnownAddress::allovr_dao_aovr_treasury())]
     aovr_treasury: Account<'info, TokenAccount>,
+
     #[account(mut, token::mint = KnownAddress::allovr_mint(), seeds = [ALLOVR_AOVR_STAKE_TREASURY_PREFIX.as_ref()], bump)]
     aovr_staking_treasury: Account<'info, TokenAccount>,
+
     #[account(mut, seeds = [ALLOVR_AOVR_STAKE_POOL_REGISTRY_PREFIX.as_ref()], bump)]
     stake_pool_registry: AccountLoader<'info, StakePoolRegistry>,
+
     #[account(mut)]
     payer: Signer<'info>,
+
     token_program: Program<'info, Token>,
     system_program: Program<'info, System>,
     clock: Sysvar<'info, Clock>,
@@ -38,7 +45,7 @@ pub fn handle_aovr_inflation_run(ctx: Context<AovrInflationRun>) -> Result<()> {
 
     require!(aovr_state.minted, AllovrError::AovrNotMinted);
     require!(
-        ctx.accounts.clock.unix_timestamp < aovr_state.next_inflation_due,
+        ctx.accounts.clock.unix_timestamp > aovr_state.next_inflation_due,
         AllovrError::AovrInflationNotDue
     );
 
@@ -81,14 +88,26 @@ pub fn handle_aovr_inflation_run(ctx: Context<AovrInflationRun>) -> Result<()> {
         ));
     }
 
+    let (_mint_authority, mint_authority_bump) =
+        Pubkey::find_program_address(&[ALLOVR_MINT_SEED_PREFIX.as_bytes()], ctx.program_id);
+
+    let cpi_program = ctx.accounts.token_program.to_account_info();
+    let mint_authority_bump_bytes = mint_authority_bump.to_le_bytes();
+    let seeds = vec![
+        ALLOVR_MINT_SEED_PREFIX.as_bytes(),
+        mint_authority_bump_bytes.as_ref(),
+    ];
+    let seeds = vec![seeds.as_slice()];
+    let seeds = seeds.as_slice();
+
     for r in recipients {
         let cpi_accounts = MintTo {
             mint: ctx.accounts.aovr_mint.to_account_info(),
             to: r.0,
             authority: ctx.accounts.mint_authority.to_account_info(),
         };
-        let cpi_program = ctx.accounts.token_program.to_account_info();
-        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+
+        let cpi_ctx = CpiContext::new_with_signer(cpi_program.clone(), cpi_accounts, seeds);
         mint_to(cpi_ctx, r.1)?;
     }
 

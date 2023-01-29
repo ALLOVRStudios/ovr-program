@@ -4,6 +4,7 @@ import { utf8 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 import {
   createAssociatedTokenAccountInstruction,
   Mint,
+  uiAmountToAmount,
 } from "@solana/spl-token";
 import { expect } from "chai";
 import { OvrProgram } from "../target/types/ovr_program";
@@ -146,16 +147,16 @@ export const checkFounderHaveNotChaged = (
   expect(allovrState.founder8.equals(founders.founder8)).true;
 };
 
-export const checkMint = async (mintInfo: Mint, supply: number) => {
+export const checkMint = async (mintInfo: Mint, supply: string) => {
   const mintAuthorityPda = await getPda([utf8.encode(ALLOVR_MINT_SEED_PREFIX)]);
   expect(mintInfo.mintAuthority.equals(mintAuthorityPda));
   expect(mintInfo.decimals).eq(ALLOVR_AOVR_DECIMAL_PLACES);
   expect(mintInfo.freezeAuthority).null;
   expect(mintInfo.isInitialized).true;
-  expect(mintInfo.supply).eq(BigInt(supply));
+  expect(mintInfo.supply.toString()).eq(supply);
 };
 
-export const confirmInitialisedAllovrState = (
+export const confirmInitialisedAllovrState = async (
   allovrState: any,
   founders: FoundersList,
   mintInfo: Mint
@@ -164,5 +165,12 @@ export const confirmInitialisedAllovrState = (
   expect(allovrState.inflationRunCount).eq(0);
   expect(allovrState.nextInflationDue.toNumber()).eq(0);
   expect(allovrState.minted).false;
-  checkMint(mintInfo, 0);
+  await checkMint(mintInfo, "0");
 };
+
+// const uiAmountToAmount = (uiAmount: number): BigInt => {
+//   const amount =
+//     BigInt(uiAmount) * BigInt(Math.pow(10, ALLOVR_AOVR_DECIMAL_PLACES));
+//   console.log(`Converting ${uiAmount} to ${amount}`);
+//   return amount;
+// };

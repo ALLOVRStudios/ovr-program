@@ -11,7 +11,7 @@ use std::str::FromStr;
 // pub const ALLOVR_PROGRAM_ID: &'static str = "GN2p6yaiKZGvxBYFTHG9Zb3KrT3h4irM9hz6u2VbK4uD";
 pub const ALLOVR_MINT_ID: &'static str = "CnZvzJDv69bCFaEes5rnxG3dpsiKtJyYxqL2PpDyawze";
 pub const ALLOVR_STATE_ID: &'static str = "GUSMgYvBw1Lm2aQQijbwDqbXaoYbdvQ7Zs6aDDMZszHF";
-pub const ALLOVR_AOVR_TREASURY_ID: &'static str = "FYCLzQeuDmBFvU8uXfHs5FLuvnBkwYHUrnbFr5XEbLpN";
+pub const ALLOVR_AOVR_TREASURY_ID: &'static str = "7nEXpeG5v9mM5obDCTUW848X3JyDfRZGMVZNjkxweH7K";
 
 pub struct KnownAddress {}
 

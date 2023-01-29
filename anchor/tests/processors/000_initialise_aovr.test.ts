@@ -78,7 +78,7 @@ describe("Initialise AOVR", () => {
       allovrMintPubkey
     );
 
-    confirmInitialisedAllovrState(allovrState, founders, mintInfo);
+    await confirmInitialisedAllovrState(allovrState, founders, mintInfo);
   });
 
   it(`Fails to initialise a second time`, async () => {
@@ -99,6 +99,12 @@ describe("Initialise AOVR", () => {
       allovrMintKeypair.publicKey
     );
 
-    confirmInitialisedAllovrState(allovrState, founders, mintInfo);
+    await confirmInitialisedAllovrState(allovrState, founders, mintInfo);
+
+    console.log("--- ALLOVR State ---");
+    console.table(allovrState);
+
+    console.log("--- ALLOVR AOVR Mint ---");
+    console.table(mintInfo);
   });
 });

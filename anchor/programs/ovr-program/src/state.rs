@@ -11,13 +11,15 @@ use anchor_lang::prelude::*;
 #[account(zero_copy)]
 #[derive(Debug)]
 pub struct StakePoolRegistry {
+    pub treasury: Pubkey,
     pub total_staked: u64,
     pub pool_head: u8,
     pub pools: [Option<StakePoolInfo>; ALLOVR_AOVR_STAKE_NUM_POOLS],
 }
 
 impl StakePoolRegistry {
-    pub fn init(&mut self) {
+    pub fn init(&mut self, treasury: Pubkey) {
+        self.treasury = treasury;
         self.total_staked = 0;
         self.pool_head = 0;
     }

@@ -36,6 +36,8 @@ pub enum AllovrError {
     StakeAlreadyInitialised,
     #[msg("AOVR not minted")]
     AovrNotMinted,
+    #[msg("AOVR already minted")]
+    AovrAlreadyMinted,
     #[msg("AOVR inflation not due")]
     AovrInflationNotDue,
     #[msg("Insufficient AOVR balance")]
