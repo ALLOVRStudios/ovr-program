@@ -13,11 +13,13 @@ use std::str::FromStr;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
+    msg,
     program_error::ProgramError,
     pubkey::Pubkey,
     sysvar::{rent::Rent, Sysvar},
 };
 
+#[derive(Debug)]
 struct Accounts<'a, 'b: 'a> {
     artist_wallet: &'a AccountInfo<'b>,
     artist_aovr_token: &'a AccountInfo<'b>,
@@ -38,11 +40,16 @@ pub fn execute(
     program_id: &Pubkey,
     args: RegisterArtistArgs,
 ) -> ProgramResult {
+    msg!("Sanitising artist data");
     let artist_data = santitise_artist_data(args)?;
     let rent = Rent::get()?;
+    msg!("artist_data {:?}", artist_data);
 
     // Artist pays 10 000 AOVR to register
+    msg!("Parsing accounts");
     let a = parse_accounts(program_id, accounts)?;
+
+    msg!("Transferring 10k to treasury");
     let transfer_aovr_ix = spl_token::instruction::transfer(
         &a.token_program.key,
         &a.artist_aovr_token.key,
@@ -73,6 +80,7 @@ pub fn execute(
     )?;
 
     // create artist token mint account
+    msg!("Creating artist token mint");
     create_pda_account(
         &rent,
         MINT_SIZE,
@@ -98,6 +106,7 @@ pub fn execute(
         0,
     )?;
 
+    msg!("Creating artist ATA");
     //create ATA for new artist token for the artist
     create_ata(
         &a.artist_wallet,
@@ -115,6 +124,7 @@ pub fn execute(
     ];
 
     // mint 10 000 000 artist tokens to artist
+    msg!("minting artist tokens");
     mint_tokens_to(
         a.artist_token_mint,   // mint account (PDA)
         a.artist_token_mint,   // mint authority (same PDA)
@@ -149,6 +159,7 @@ pub fn execute(
         metadata_authority_signer_seeds,
     )?;
 
+    msg!("Saving metadata");
     // Save meta data
     let mut metadata: ArtistMetadata =
         try_from_slice_unchecked(&a.artist_token_meta.data.borrow_mut())?;
@@ -165,17 +176,22 @@ pub fn execute(
         uri = artist_data.uri.unwrap();
     }
 
-    create_metaplex_metadata_account(
-        &a.artist_token_metaplex_meta,
-        &a.artist_token_mint,
-        &a.artist_wallet,
-        &a.metaplex_meta_program_account,
-        &a.rent_sysvar,
-        String::from(&metadata.name),
-        String::from(&metadata.symbol),
-        uri,
-        signers_seeds,
-    )?;
+    if artist_data.create_metaplex_metadata.is_none()
+        || artist_data.create_metaplex_metadata.unwrap() == true
+    {
+        msg!("Creating metaplex metadata acc");
+        create_metaplex_metadata_account(
+            &a.artist_token_metaplex_meta,
+            &a.artist_token_mint,
+            &a.artist_wallet,
+            &a.metaplex_meta_program_account,
+            &a.rent_sysvar,
+            String::from(&metadata.name),
+            String::from(&metadata.symbol),
+            uri,
+            signers_seeds,
+        )?;
+    }
 
     Ok(())
 }
@@ -215,9 +231,7 @@ fn parse_accounts<'a, 'b: 'a>(
         *accounts.artist_wallet.key,
     )?;
 
-    if *accounts._associated_token_account_program.key != spl_associated_token_account::id() {
-        return Err(AllovrError::InvalidAssociatedTokenAccountProgram.into());
-    }
+    assert_ata_program_matches_package(accounts._associated_token_account_program)?;
 
     Ok(accounts)
 }

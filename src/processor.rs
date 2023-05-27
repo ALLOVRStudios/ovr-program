@@ -31,6 +31,22 @@ impl Processor {
                 msg!("Update Artist Instruction");
                 update_artist::execute(accounts, program_id, args)
             }
+            AllovrInstruction::CreateArtwork(args) => {
+                msg!("Create Artwork Instruction");
+                create_artwork::execute(accounts, program_id, args)
+            }
+            AllovrInstruction::InitArtworkSale(args) => {
+                msg!("Init Artwork Sale Instruction");
+                init_artwork_sale::execute(accounts, program_id, args)
+            }
+            AllovrInstruction::CancelArtworkSale() => {
+                msg!("Cancel Artwork Sale Instruction");
+                cancel_artwork_sale::execute(accounts, program_id)
+            }
+            AllovrInstruction::AcceptArtworkSale() => {
+                msg!("Accept Artwork Sale Instruction");
+                accept_artwork_sale::execute(accounts, program_id)
+            }
         }
     }
 }

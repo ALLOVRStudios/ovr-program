@@ -1,6 +1,8 @@
 use borsh::{BorshDeserialize, BorshSchema, BorshSerialize};
 use solana_program::pubkey::Pubkey;
 
+use crate::state::Currency;
+
 #[repr(C)]
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone, BorshSchema)]
 pub struct InitialisaAllovrArgs {
@@ -21,6 +23,23 @@ pub struct RegisterArtistArgs {
     pub description: String,
     pub token_symbol: String,
     pub uri: Option<String>,
+    pub create_metaplex_metadata: Option<bool>,
+}
+
+#[repr(C)]
+#[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone, BorshSchema)]
+pub struct InitArtworkSaleArgs {
+    pub buyer: Pubkey,
+    pub amount: u64,
+    pub currency: Currency,
+    pub payment_account: Pubkey,
+}
+
+#[repr(C)]
+#[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone, BorshSchema)]
+pub struct CreateArtworkArgs {
+    pub symbol: String,
+    pub description: String,
 }
 
 #[repr(C)]
@@ -60,7 +79,7 @@ pub enum AllovrInstruction {
     /// `[]` Token Program
     /// `[]` Rent Sysvar
     /// `[]` Clock Sysvar
-    /// `[]` System    
+    /// `[]` System
     MintAllovr,
     /// Register Artist
     ///
@@ -91,4 +110,13 @@ pub enum AllovrInstruction {
     /// `[signer]` Artist Wallet
     /// `[writable]` Artist Metadata Account to be updated (PDA with seed prefix ALLOVRARTISTMETA and Artist Token Mint address)   
     UpdateArtist(RegisterArtistArgs),
+    /// Create Artwork
+    ///
+    /// Accounts exepected:
+    ///
+    ///
+    CreateArtwork(CreateArtworkArgs),
+    InitArtworkSale(InitArtworkSaleArgs),
+    CancelArtworkSale(),
+    AcceptArtworkSale(),
 }

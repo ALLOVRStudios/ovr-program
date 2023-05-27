@@ -1,0 +1,34 @@
+{
+  "name": "ovr-program",
+  "version": "1.0.0",
+  "description": "OVR Program is a Solana Program which forms the basis of the ALLOVR Protocol.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build-ovr-program": "cargo build-bpf --manifest-path=./Cargo.toml --bpf-out-dir=$HOME/allovr_data/program",
+    "deploy-ovr-program": "solana config get && cli-confirm \"Do you really want to deploy to SOLANA? Please check which cluster you are pointing to. (y/n)\" && solana program deploy $HOME/allovr_data/program/ovr_program.so",
+    "start-local-cluster": "solana-test-validator",
+    "clear-and-start-local-cluster": "solana-test-validator -r",
+    "point-to-local-cluster": "solana config set --url localhost",
+    "point-to-devnet-cluster": "solana config set --url https://api.devnet.solana.com",
+    "point-to-mainnet-cluster": "cli-confirm \"Do you really want to point to SOLANA mainnet (y/n)?\" && solana config set --url https://api.mainnet-beta.solana.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ALLOVRStudios/ovr-program.git"
+  },
+  "keywords": [
+    "ovr-program"
+  ],
+  "author": "Bosko Kovacevic",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ALLOVRStudios/ovr-program/issues"
+  },
+  "homepage": "https://github.com/ALLOVRStudios/ovr-program#readme",
+  "dependencies": {
+    "cli-confirm": "^1.0.1"
+  }
+}

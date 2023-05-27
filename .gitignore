@@ -11,5 +11,8 @@ Cargo.lock
 
 /dist/
 
+test-ledger/
+node_modules/
+
 keys.secret
 .DS_Store

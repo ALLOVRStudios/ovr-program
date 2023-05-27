@@ -1,4 +1,4 @@
-use borsh::{BorshDeserialize, BorshSerialize};
+use borsh::{BorshDeserialize, BorshSchema, BorshSerialize};
 use solana_program::clock::UnixTimestamp;
 use solana_program::pubkey::Pubkey;
 
@@ -23,4 +23,24 @@ pub struct ArtistMetadata {
     pub description: String,
     pub symbol: String,
     pub uri: Option<String>,
+}
+
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
+pub struct ArtworkMetadata {
+    pub artist: Pubkey,
+    pub symbol: String,
+    pub description: String,
+    pub holder: Pubkey,
+    pub offer_count: u32,
+    pub offered_to: Option<Pubkey>,
+    pub offer_price: Option<u64>,
+    pub offer_currency: Option<Currency>,
+    pub payment_account: Option<Pubkey>,
+}
+
+#[repr(C)]
+#[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone, BorshSchema)]
+pub enum Currency {
+    SOL,
+    AOVR,
 }

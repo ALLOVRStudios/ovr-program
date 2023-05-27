@@ -80,17 +80,20 @@ pub fn execute(
         &[artist_token_mint_bump],
     ];
 
-    // Update the Metaplex metadata for artist token so that wallets can show the token name, symbol and image
-
-    update_metaplex_metadata_account(
-        &a.artist_token_metaplex_meta,
-        &a.artist_token_mint,
-        &a.metaplex_meta_program_account,
-        String::from(&metadata.name),
-        String::from(&metadata.symbol),
-        uri,
-        signers_seeds,
-    )?;
+    if artist_data.create_metaplex_metadata.is_none()
+        || artist_data.create_metaplex_metadata.unwrap() == true
+    {
+        // Update the Metaplex metadata for artist token so that wallets can show the token name, symbol and image
+        update_metaplex_metadata_account(
+            &a.artist_token_metaplex_meta,
+            &a.artist_token_mint,
+            &a.metaplex_meta_program_account,
+            String::from(&metadata.name),
+            String::from(&metadata.symbol),
+            uri,
+            signers_seeds,
+        )?;
+    }
 
     Ok(())
 }

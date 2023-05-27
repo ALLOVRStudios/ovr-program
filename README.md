@@ -10,6 +10,11 @@ Currently the only available functionality is:
 
 - init
 - mint
+- register artist
+- create artwork
+- initialise artwork sale
+- cancel artwork sale
+- accept artwork sale
 
 ## Invoking functions.
 
@@ -17,6 +22,11 @@ The first byte of the data parameter determines the function to be executed
 
 - 0 = init
 - 1 = mint
+- 2 = register artist
+- 3 = create artwork
+- 4 = initialise artwork sale
+- 5 = cancel artwork sale
+- 6 = accept artwork sale
 - ...more to follow
 
 ## Init
@@ -93,7 +103,7 @@ solana program deploy /mnt/c/allovr_data/program/allovr_token.so
 ## Local development note for MacOS
 
 solana-test-validator -r (-r to clear data and start again)
-cargo build-bpf --manifest-path=./Cargo.toml --bpf-out-dir=/Users/boskokovacevic/allovr_data/program
+cargo build-bpf --manifest-path=./Cargo.toml --bpf-out-dir=$HOME/allovr_data/program
 solana program deploy /Users/boskokovacevic/allovr_data/program/ovr_program.so
 
 More coming soon.

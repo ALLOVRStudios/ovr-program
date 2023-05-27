@@ -60,6 +60,14 @@ pub fn assert_token_program_matches_package(token_program_info: &AccountInfo) ->
     }
 }
 
+pub fn assert_ata_program_matches_package(ata_program_info: &AccountInfo) -> ProgramResult {
+    if *ata_program_info.key != spl_associated_token_account::id() {
+        return Err(AllovrError::InvalidAssociatedTokenAccountProgram.into());
+    } else {
+        Ok(())
+    }
+}
+
 pub fn assert_system(system_program_info: &AccountInfo) -> ProgramResult {
     if *system_program_info.key != solana_program::system_program::id() {
         return Err(AllovrError::InvalidSystemProgramId.into());
@@ -510,11 +518,18 @@ pub fn santitise_artist_data(args: RegisterArtistArgs) -> Result<RegisterArtistA
         artist_uri_option = Some(artist_uri);
     }
 
+    let mut create_metaplex_metadata_option: Option<bool> = None;
+    if args.create_metaplex_metadata.is_some() {
+        let create_metaplex_metadata = args.create_metaplex_metadata.unwrap();
+        create_metaplex_metadata_option = Some(create_metaplex_metadata);
+    }
+
     let response = RegisterArtistArgs {
         name: artist_name,
         description: artist_description,
         token_symbol: artist_token_symbol,
         uri: artist_uri_option,
+        create_metaplex_metadata: create_metaplex_metadata_option,
     };
 
     Ok(response)
